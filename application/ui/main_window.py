@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Sat Oct 26 22:14:20 2013
+# Created: Sun Oct 27 14:44:56 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -78,9 +78,15 @@ class Ui_MainWindow(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.graphicsView = QtGui.QGraphicsView(self.centralwidget)
-        self.graphicsView.setObjectName("graphicsView")
-        self.verticalLayout.addWidget(self.graphicsView)
+        self.analyzerWidget = AnalyzerWidget(self.centralwidget)
+        self.analyzerWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.analyzerWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        brush = QtGui.QBrush(QtGui.QColor(50, 50, 70))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        self.analyzerWidget.setBackgroundBrush(brush)
+        self.analyzerWidget.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
+        self.analyzerWidget.setObjectName("analyzerWidget")
+        self.verticalLayout.addWidget(self.analyzerWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 911, 22))
@@ -117,3 +123,4 @@ class Ui_MainWindow(object):
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSave_to_Spreadsheet.setText(QtGui.QApplication.translate("MainWindow", "Save to Spreadsheet...", None, QtGui.QApplication.UnicodeUTF8))
 
+from ui.widgets import AnalyzerWidget

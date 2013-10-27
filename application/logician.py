@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import random
 
 from PySide import QtGui, QtCore
 from ui.main_window import Ui_MainWindow
@@ -16,7 +17,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def on_startButton_clicked(self):
-        print 'Start Clicked.'
+        self.analyzerWidget.setData([[random.randint(0, 1) for i in range(100)],
+                                     [random.randint(0, 1) for i in range(100)],
+                                     [random.randint(0, 1) for i in range(100)],
+                                     [random.randint(0, 1) for i in range(100)]])
 
     def closeEvent(self, event):
         """
