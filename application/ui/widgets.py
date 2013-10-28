@@ -7,8 +7,9 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         super(AnalyzerWidget, self).__init__(parent)
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
-        self._data = [[0],[0],[0],[0]]
-        self._scale = 20
+        self.data = [[0],[0],[0],[0]]
+        self.zoomLevel = 20
+        self.channelCount = 4
 
         colors = [QtGui.QColor(0x3C, 0x9D, 0xD0, 255),
                   QtGui.QColor(0xB9, 0x39, 0xD3, 255),
@@ -26,30 +27,23 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.grabGesture(QtCore.Qt.PinchGesture)
 
     def setData(self, data):
-        self._data = data
+        self.data = data
         self.redraw()
 
     def drawSignals(self):
         subviewHeight = self.height() / 4 - self._subviewMargin / 2
-        for i, line in enumerate(self._data):
-            path = QtGui.QPainterPath(QtCore.QPointF(0, line[0]))
-            last_val = line[0]
-            for j, d in enumerate(line):
-                if d == last_val:
-                    path.lineTo(j, d*subviewHeight)
-                else:
-                    path.lineTo(j - 1, d*subviewHeight)
-                    path.lineTo(j, d*subviewHeight)
-                last_val = d
-            path.translate(0, i*subviewHeight + i*self._subviewMargin / 2)
-            self.scene.addPath(path, self.channelPens[i])
+        for i, data in enumerate(self.data):
+            item = AnalyzerChannelGraphicsItem(data, subviewHeight,
+                                               self.channelPens[i])
+            item.setY(i*subviewHeight + i*self._subviewMargin / 2)
+            self.scene.addItem(item)
 
     def redraw(self):
         self.resetTransform()
         self.scene.clear()
         self.drawSignals()
-        self.scale(self._scale, 1)
-        self.scene.setSceneRect(0, 0, len(self._data[0]),
+        self.scale(self.zoomLevel, 1)
+        self.scene.setSceneRect(0, 0, len(self.data[0]),
                                 self.height() - self._subviewMargin/2)
 
     def event(self, event):
@@ -64,8 +58,34 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def gestureEvent(self, event):
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
-            self._scale *= gesture.scaleFactor()
-            if self._scale < 1:
-                self._scale = 1
+            self.zoomLevel *= gesture.scaleFactor()
+            if self.zoomLevel < 1:
+                self.zoomLevel = 1
             self.redraw()
         return True
+
+class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
+    """
+    The view of a single channel, including the waveform and labels.
+    """
+    def __init__(self, data, height, pen, parent=None):
+        super(AnalyzerChannelGraphicsItem, self).__init__(parent)
+        self.data = data
+        self.pen = pen
+        self.height = height
+        topMargin = 32
+        waveformHeight = height - topMargin
+
+        # Build path
+        path = QtGui.QPainterPath(QtCore.QPointF(0, data[0] + topMargin))
+        last_val = data[0]
+        for i, d in enumerate(data):
+            if d == last_val:
+                path.lineTo(i, d*waveformHeight + topMargin)
+            else:
+                path.lineTo(i - 1, d*waveformHeight + topMargin)
+                path.lineTo(i, d*waveformHeight + topMargin)
+            last_val = d
+        self.waveformPathItem = QtGui.QGraphicsPathItem(path, self)
+        self.waveformPathItem.setPen(pen)
+        self.addToGroup(self.waveformPathItem)
