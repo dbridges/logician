@@ -79,12 +79,13 @@ int main(void)
 
     while (1) {
         if (sample_count > 0) {
-            sample_count--;
-            data_byte = ((uint8_t)GPIO_ReadInputData(GPIOA) << 4);
-            timing_delay(144);
-            data_byte |= ((uint8_t)GPIO_ReadInputData(GPIOA) && 0x0F);
-            timing_delay(144);
+            start = *DWT_CYCCNT;
+            data_byte = ((uint8_t)GPIOA->IDR) << 4;
+            timing_delay(144 - (start - *DWT_CYCNT) - 1);
+            data_byte = ((uint8_t)GPIOA->IDR) & 0x0F;
             VCP_put_char(data_byte);
+            sample_count--;
+            timing_delay(288 - (start - *DWT_CYCNT) - 1);
         } else if (check_usb()) {
             params = Protocol_SessionParams();
             sample_count = params->sample_count;
