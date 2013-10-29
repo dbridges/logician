@@ -5,15 +5,18 @@
 
 #define PROTOCOL_BUFFER_LENGTH  64
 
-typedef struct {
-    uint16_t sample_period;      /* 200 - 20000 uS */
-    uint32_t acquisition_length; /* In systime counts */
-} session_parm_t;
+typedef enum {
+    COMMAND_ACQUIRE
+} command_t;
 
-session_parm_t *Protocol_SessionParams(void);
-uint8_t         Protocol_ProcessNewPacket(void);
-uint8_t         Protocol_SendU16(uint16_t byte);
-uint8_t         Protocol_SendI16(int16_t byte);
+typedef struct {
+    uint16_t sample_period;      /* In us. */
+    uint32_t sample_count;       /* Number of samples to acquire. */
+} session_param_t;
+
+session_param_t *Protocol_SessionParams(void);
+uint8_t          Protocol_ProcessNewPacket(void);
+uint8_t          Protocol_SendU16(uint16_t byte);
 
 
 #endif

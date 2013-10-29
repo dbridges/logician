@@ -11,16 +11,40 @@
 #include "usbd_desc.h"
 #include "usbd_cdc_vcp.h"
 
-#include "systime.h"
 #include "macros.h"
-#include "scheduler.h"
 #include "protocol.h"
 
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 extern uint8_t protocol_rx_buffer[64];
-static Task *acquire_task;
-static uint32_t sample_len;
+
+volatile unsigned int *DWT_CYCCNT  = (volatile unsigned int *)0xE0001004;
+volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000;
+volatile unsigned int *SCB_DEMCR   = (volatile unsigned int *)0xE000EDFC;
+
+void enable_timing(void)
+{
+    static int enabled = 0;
+ 
+    if (!enabled)
+    {
+        *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
+        *DWT_CYCCNT = 0; // reset the counter
+        *DWT_CONTROL = *DWT_CONTROL | 1 ; // enable the counter
+ 
+        enabled = 1;
+    }
+}
+
+void timing_delay(unsigned int tick)
+{
+    unsigned int start, current;
+
+    start = *DWT_CYCCNT;
+    do {
+        current = *DWT_CYCCNT;
+    } while((current - start) < tick);
+}
 
 static void usb_cdc_init(void)
 {
@@ -31,30 +55,42 @@ static void usb_cdc_init(void)
               &USR_cb);
 }
 
-/* Task Callbacks */
-void check_usb(Task *task)
+uint8_t check_usb()
 {
-    session_parm_t params;
-
     if (VCP_data_available() >= 64) {
         VCP_get_buffer(protocol_rx_buffer, 64);
         Protocol_ProcessNewPacket();
-        params = *Protocol_SessionParams();
-        sample_len = params.acquisition_length/params.sample_period;
+        return 1;
     }
+
+    return 0;
 }
 
 int main(void)
 {
+    uint8_t data_byte;
+    unsigned int start, current;
+    uint32_t sample_count = 0;
+    session_param_t *params;
+
     usb_cdc_init();
-    SysTime_Init();
-
     VCP_flush_rx();
+    enable_timing();
 
-    Scheduler_AddTask(systime(), 1000, &check_usb, TRUE);
-    
     while (1) {
-        Scheduler_Run(systime());
+        if (sample_count > 0) {
+            sample_count--;
+            data_byte = ((uint8_t)GPIO_ReadInputData(GPIOA) << 4);
+            timing_delay(144);
+            data_byte |= ((uint8_t)GPIO_ReadInputData(GPIOA) && 0x0F);
+            timing_delay(144);
+            VCP_put_char(data_byte);
+        } else if (check_usb()) {
+            params = Protocol_SessionParams();
+            sample_count = params->sample_count;
+        } else {
+            timing_delay(1440000);  /* Wait 10 ms */
+        }
     }
 
     return 0;
