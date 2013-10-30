@@ -62,7 +62,6 @@ uint8_t check_usb()
         Protocol_ProcessNewPacket();
         return 1;
     }
-
     return 0;
 }
 
@@ -80,9 +79,9 @@ int main(void)
     while (1) {
         if (sample_count > 0) {
             start = *DWT_CYCCNT;
-            data_byte = ((uint8_t)GPIOA->IDR) << 4;
+            data_byte = ((uint8_t)INPUT_PORT->IDR) << 4;
             timing_delay(144 - (start - *DWT_CYCNT) - 1);
-            data_byte = ((uint8_t)GPIOA->IDR) & 0x0F;
+            data_byte = ((uint8_t)INPUT_PORT->IDR) & 0x0F;
             VCP_put_char(data_byte);
             sample_count--;
             timing_delay(288 - (start - *DWT_CYCNT) - 1);
