@@ -80,11 +80,11 @@ int main(void)
         if (sample_count > 0) {
             start = *DWT_CYCCNT;
             data_byte = ((uint8_t)INPUT_PORT->IDR) << 4;
-            timing_delay(144 - (start - *DWT_CYCNT) - 1);
+            timing_delay(144 - (*DWT_CYCNT - start) - 1);
             data_byte = ((uint8_t)INPUT_PORT->IDR) & 0x0F;
             VCP_put_char(data_byte);
             sample_count--;
-            timing_delay(288 - (start - *DWT_CYCNT) - 1);
+            timing_delay(288 - (*DWT_CYCNT - start) - 1);
         } else if (check_usb()) {
             params = Protocol_SessionParams();
             sample_count = params->sample_count;
