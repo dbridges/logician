@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import itertools
+
 from PySide import QtGui, QtCore
 
 class AnalyzerWidget(QtGui.QGraphicsView):
@@ -7,7 +9,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         super(AnalyzerWidget, self).__init__(parent)
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
-        self.data = [[0],[0],[0],[0]]
+        self.data = [[],[],[],[]]
         self.zoomLevel = 20
         self.channelCount = 4
 
@@ -31,6 +33,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.redraw()
 
     def drawSignals(self):
+        if len(self.data[0]) == 0:
+            return
         subviewHeight = self.height() / 4 - self._subviewMargin / 2
         for i, data in enumerate(self.data):
             item = AnalyzerChannelGraphicsItem(data, subviewHeight,
@@ -64,6 +68,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.redraw()
         return True
 
+
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
     """
     The view of a single channel, including the waveform and labels.
@@ -76,16 +81,20 @@ class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
         topMargin = 32
         waveformHeight = height - topMargin
 
-        # Build path
-        path = QtGui.QPainterPath(QtCore.QPointF(0, data[0] + topMargin))
-        last_val = data[0]
-        for i, d in enumerate(data):
-            if d == last_val:
-                path.lineTo(i, d*waveformHeight + topMargin)
-            else:
-                path.lineTo(i - 1, d*waveformHeight + topMargin)
-                path.lineTo(i, d*waveformHeight + topMargin)
-            last_val = d
+        # Build path with as few lines as possible.
+        path = QtGui.QPainterPath(QtCore.QPointF(0, data[0]))
+        x = 0
+        y = self.data[0]
+        while x < len(self.data):
+            while x < len(self.data) and self.data[x] == y:
+                x += 1
+            path.lineTo(x, -y*waveformHeight)
+            y = 0 if y == 1 else 1
+            if x != len(self.data):
+                path.lineTo(x, -y*waveformHeight)
+        path.translate(0, waveformHeight + topMargin)
+
+
         self.waveformPathItem = QtGui.QGraphicsPathItem(path, self)
         self.waveformPathItem.setPen(pen)
         self.addToGroup(self.waveformPathItem)

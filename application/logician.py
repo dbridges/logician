@@ -17,10 +17,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def on_startButton_clicked(self):
-        self.analyzerWidget.setData([[random.randint(0, 1) for i in range(1000)],
-                                     [random.randint(0, 1) for i in range(1000)],
-                                     [random.randint(0, 1) for i in range(1000)],
-                                     [random.randint(0, 1) for i in range(1000)]])
+        self.analyzerWidget.setData([[0,0,0,1,1,0,0,0],
+                                     [0,0,0,1,1,0,0,0],
+                                     [0,0,0,1,1,0,0,0],
+                                     [0,0,0,1,1,0,0,0]])
 
     def closeEvent(self, event):
         """
