@@ -11,12 +11,17 @@
 #include "usbd_desc.h"
 #include "usbd_cdc_vcp.h"
 
-#include "macros.h"
 #include "protocol.h"
 
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
+#define DAQ_PORT            GPIOD
+#define DAQ_BUFFER_LEN      2000 
+
 extern uint8_t protocol_rx_buffer[64];
+
+static uint8_t daq_buffer[DAQ_BUFFER_LEN];
+static uint8_t sampling = FALSE;
 
 volatile unsigned int *DWT_CYCCNT  = (volatile unsigned int *)0xE0001004;
 volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000;
@@ -46,6 +51,19 @@ void timing_delay(unsigned int tick)
     } while((current - start) < tick);
 }
 
+static void gpio_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
+    GPIO_Init(DAQ_PORT, &GPIO_InitStructure);
+}
+
 static void usb_cdc_init(void)
 {
     USBD_Init(&USB_OTG_dev,
@@ -71,26 +89,39 @@ int main(void)
     unsigned int start, current;
     uint32_t sample_count = 0;
     session_param_t *params;
+    uint32_t daq_i = 0;
 
+    gpio_init();
     usb_cdc_init();
     VCP_flush_rx();
     enable_timing();
 
     while (1) {
-        if (sample_count > 0) {
+        while(!check_usb());
+        /*params = Protocol_SessionParams();*/
+        /*sample_count = params->sample_count;*/
+        sample_count = 2000;
+
+        while (sample_count > 0) {
             start = *DWT_CYCCNT;
-            data_byte = ((uint8_t)INPUT_PORT->IDR) << 4;
-            timing_delay(144 - (*DWT_CYCNT - start) - 1);
-            data_byte = ((uint8_t)INPUT_PORT->IDR) & 0x0F;
-            VCP_put_char(data_byte);
+            data_byte = ((uint8_t)DAQ_PORT->IDR) << 4;
+            timing_delay(144 - (*DWT_CYCCNT - start) - 1);
+            data_byte |= ((uint8_t)DAQ_PORT->IDR) & 0x0F;
+
+            daq_buffer[daq_i] = data_byte;
+            daq_i++;
+            if (daq_i > DAQ_BUFFER_LEN)
+                daq_i = 0;
+
             sample_count--;
-            timing_delay(288 - (*DWT_CYCNT - start) - 1);
-        } else if (check_usb()) {
-            params = Protocol_SessionParams();
-            sample_count = params->sample_count;
-        } else {
-            timing_delay(1440000);  /* Wait 10 ms */
+            timing_delay(288 - (*DWT_CYCCNT - start) - 1);
         }
+
+        /* Just finished acquisition. */
+        sampling = FALSE;
+        VCP_send_buffer(&daq_buffer[daq_i], DAQ_BUFFER_LEN - daq_i);
+        VCP_send_buffer(daq_buffer, daq_i);
+        daq_i = 0;
     }
 
     return 0;
