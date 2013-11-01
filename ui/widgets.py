@@ -12,7 +12,6 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
         self.data = [[],[],[],[]]
-        self.zoomLevel = 20
         self.channelCount = 4
 
         colors = [QtGui.QColor(0x3C, 0x9D, 0xD0, 255),
@@ -23,8 +22,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         for n in range(4):
             p = QtGui.QPen()
             p.setColor(colors[n])
-            p.setWidth(2.0)
-            p.setCosmetic(True)
+            p.setWidth(0)
             self.channelPens.append(p)
 
         self._subviewMargin = 24
@@ -33,7 +31,6 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def setData(self, data):
         data.reverse()
         self.data = data
-        self.zoomLevel = self.width() / float(len(data[0]))
         self.redraw()
 
     def drawSignals(self):
@@ -50,7 +47,6 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.resetTransform()
         self.scene.clear()
         self.drawSignals()
-        self.scale(self.zoomLevel, 1)
         self.scene.setSceneRect(0, 0, len(self.data[0]),
                                 self.height() - self._subviewMargin/2)
 
@@ -66,10 +62,14 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def gestureEvent(self, event):
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
-            self.zoomLevel *= gesture.scaleFactor()
-            if self.zoomLevel < 0.1:
-                self.zoomLevel = 0.1
-            self.redraw()
+            x_scale = self.transform().m11()
+            new_scale = x_scale * gesture.scaleFactor()
+            if new_scale > 20:
+                new_scale = 20
+            elif new_scale < 0.1:
+                new_scale = 0.1
+            self.resetTransform()
+            self.scale(new_scale, 1)
         return True
 
     def mouseMoveEvent(self, event):

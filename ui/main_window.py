@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Fri Nov  1 13:07:27 2013
+# Created: Fri Nov  1 14:18:59 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -79,13 +79,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.analyzerWidget = AnalyzerWidget(self.centralwidget)
+        self.analyzerWidget.setProperty("cursor", QtCore.Qt.CrossCursor)
         self.analyzerWidget.setMouseTracking(True)
         self.analyzerWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.analyzerWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         brush = QtGui.QBrush(QtGui.QColor(50, 50, 70))
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.analyzerWidget.setBackgroundBrush(brush)
-        self.analyzerWidget.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
+        self.analyzerWidget.setDragMode(QtGui.QGraphicsView.NoDrag)
         self.analyzerWidget.setObjectName("analyzerWidget")
         self.verticalLayout.addWidget(self.analyzerWidget)
         MainWindow.setCentralWidget(self.centralwidget)

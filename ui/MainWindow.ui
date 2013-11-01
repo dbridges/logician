@@ -175,6 +175,9 @@
     </item>
     <item>
      <widget class="AnalyzerWidget" name="analyzerWidget">
+      <property name="cursor" stdset="0">
+       <cursorShape>CrossCursor</cursorShape>
+      </property>
       <property name="mouseTracking">
        <bool>true</bool>
       </property>
@@ -194,7 +197,7 @@
        </brush>
       </property>
       <property name="dragMode">
-       <enum>QGraphicsView::ScrollHandDrag</enum>
+       <enum>QGraphicsView::NoDrag</enum>
       </property>
      </widget>
     </item>
