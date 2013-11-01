@@ -5,6 +5,8 @@ import itertools
 from PySide import QtGui, QtCore
 
 class AnalyzerWidget(QtGui.QGraphicsView):
+    showMessage = QtCore.Signal(object)
+
     def __init__(self, parent=None):
         super(AnalyzerWidget, self).__init__(parent)
         self.scene = QtGui.QGraphicsScene(self)
@@ -29,7 +31,9 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.grabGesture(QtCore.Qt.PinchGesture)
 
     def setData(self, data):
+        data.reverse()
         self.data = data
+        self.zoomLevel = self.width() / float(len(data[0]))
         self.redraw()
 
     def drawSignals(self):
@@ -63,10 +67,14 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
             self.zoomLevel *= gesture.scaleFactor()
-            if self.zoomLevel < 1:
-                self.zoomLevel = 1
+            if self.zoomLevel < 0.1:
+                self.zoomLevel = 0.1
             self.redraw()
         return True
+
+    def mouseMoveEvent(self, event):
+        pt = self.mapToScene(event.pos())
+        self.showMessage.emit('%f, %f' % (pt.x(), pt.y()))
 
 
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
@@ -82,7 +90,7 @@ class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
         waveformHeight = height - topMargin
 
         # Build path with as few lines as possible.
-        path = QtGui.QPainterPath(QtCore.QPointF(0, data[0]))
+        path = QtGui.QPainterPath(QtCore.QPointF(0, -data[0]*waveformHeight))
         x = 0
         y = self.data[0]
         while x < len(self.data):

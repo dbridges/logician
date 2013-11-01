@@ -175,6 +175,9 @@
     </item>
     <item>
      <widget class="AnalyzerWidget" name="analyzerWidget">
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
@@ -214,6 +217,7 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionSave_to_Spreadsheet">
    <property name="text">
     <string>Save to Spreadsheet...</string>

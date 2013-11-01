@@ -83,7 +83,6 @@ class AcquireThread(QtCore.QThread):
 
         out_string = (''.join([chr(x) for x in self.command_bytes]) +
             ' '*(64 - len(self.command_bytes)))    #Pad string to 64 bytes
-        print out_string
         self.serial.write(out_string)
 
         while self._running:
@@ -116,6 +115,8 @@ class AcquireThread(QtCore.QThread):
         self._running = False
         if self.serial != None:
             self.serial.close()
+            self.finished.emit()
+            self.exit()
         if wait:
             self.wait()
 
@@ -127,7 +128,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent_app, parent=None):
         super(MainWindow, self).__init__(parent)
         self.app = parent_app
+        self.acquireThread = None
         self.setupUi(self)
+        self.analyzerWidget.showMessage.connect(self.statusBar.showMessage,
+                                    QtCore.Qt.QueuedConnection)
         self.loadSettings()
 
     @QtCore.Slot()
@@ -138,12 +142,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
              (100 & 0x00FF), (100 >> 8),        # Sample Period (ms)
              (aq_len & 0x00FF), (aq_len >> 8)]                      # Acquisition Length (1/10th s)
 
+        self.startButton.setEnabled(False)
         self.acquireThread = AcquireThread(command_bytes)
         self.acquireThread.dataReady.connect(self.on_acquireThread_data,
                                              QtCore.Qt.QueuedConnection)
+        self.acquireThread.finished.connect(self.on_acquireThread_finished,
+                                            QtCore.Qt.QueuedConnection)
         self.acquireThread.start()
 
-    @QtCore.Slot()
     def on_acquireThread_data(self, data):
         sep_channel_data = [f(c) for c in data for f in (lambda x: ord(x) >> 4,
                                                          lambda x: ord(x) & 0x0F)]
@@ -151,6 +157,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                          for d in sep_channel_data]
         packed_data = zip(*unpacked_data)
         self.analyzerWidget.setData(packed_data)
+
+    def on_acquireThread_finished(self):
+        self.startButton.setEnabled(True)
 
     def loadSettings(self):
         try:
@@ -169,7 +178,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         settings.setValue('geometry', self.saveGeometry())
         settings.setValue('maximized', self.isMaximized())
         settings.endGroup()
-
 
     def closeEvent(self, event):
         """
