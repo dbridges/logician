@@ -44,11 +44,39 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.scene.addItem(item)
 
     def redraw(self):
+        x_scale = self.transform().m11()
         self.resetTransform()
         self.scene.clear()
         self.drawSignals()
+        self.scale(x_scale, 1)
         self.scene.setSceneRect(0, 0, len(self.data[0]),
                                 self.height() - self._subviewMargin/2)
+
+    def paintEvent(self, event):
+        super(AnalyzerWidget, self).paintEvent(event)
+        painter = QtGui.QPainter(self.viewport())
+        pen = QtGui.QPen(QtGui.QColor(128, 128, 128, 255))
+        painter.setPen(pen)
+
+        ch_height = self.height() / len(self.data)
+
+        for n in range(len(self.data)):
+            painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
+
+        pen.setColor(QtGui.QColor(0, 0, 0, 0))
+        painter.setPen(pen)
+        sidebar_width = 110
+        painter.setBrush(QtGui.QBrush(QtGui.QColor(80, 80, 80, 220)))
+        painter.drawRect(0, 0, sidebar_width, self.height())
+        pen.setColor(QtGui.QColor(0, 0, 0, 255))
+        painter.setPen(pen)
+        painter.drawLine(sidebar_width, 0, sidebar_width, self.height())
+
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 255)))
+        for n in range(len(self.data)):
+            painter.drawText(0, ch_height*n, sidebar_width, ch_height,
+                             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
+                             'Channel %d' % n)
 
     def event(self, event):
         if event.type() == QtCore.QEvent.Gesture:

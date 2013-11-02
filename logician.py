@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 import sys
+import os
 import random
 import time
 
 import serial
 from serial.tools import list_ports
-
 from PySide import QtGui, QtCore
+
+import util
 from ui.main_window import Ui_MainWindow
 
 class AcquireThread(QtCore.QThread):
@@ -130,6 +132,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.app = parent_app
         self.acquireThread = None
         self.setupUi(self)
+        self.toolBar.addWidget(self.topRowLayoutWidget)
         self.analyzerWidget.showMessage.connect(self.statusBar.showMessage,
                                     QtCore.Qt.QueuedConnection)
         self.loadSettings()
@@ -149,6 +152,21 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.acquireThread.finished.connect(self.on_acquireThread_finished,
                                             QtCore.Qt.QueuedConnection)
         self.acquireThread.start()
+
+    @QtCore.Slot()
+    def on_actionOpen_triggered(self):
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open data file.',
+                                                     os.getcwd(),
+                                                     "CSV Files (*.csv)")[0]
+        if filename == '':
+            return
+        try:
+            data = util.read_csv(filename)
+        except:
+            msg = QtGui.QMessageBox();
+            msg.setText('Error loading file.')
+            msg.exec_()
+        self.analyzerWidget.setData(data)
 
     def on_acquireThread_data(self, data):
         sep_channel_data = [f(c) for c in data for f in (lambda x: ord(x) >> 4,
