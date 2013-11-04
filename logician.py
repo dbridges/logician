@@ -10,10 +10,15 @@ from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
 import util
+import models
 from ui.main_window import Ui_MainWindow
 
 class AcquireThread(QtCore.QThread):
     """
+    Asynchronous serial thread to gather data from hardware.
+
+    Parameters
+    ----------
     com_desc : string
         A description of the com port device. The com ports are
         searched and the first port that has com_desc in its
@@ -26,10 +31,8 @@ class AcquireThread(QtCore.QThread):
     baud : int
         The baud rate to connect with.
 
-    Asynchronous serial thread to gather data.
-
-    This object polls the serial port and emits whole lines of data
-    as they are received.
+    This object polls the serial port and emits an acquisiton when
+    it is received. It then kills the thread.
     """
 
     dataReady = QtCore.Signal(object)
@@ -64,9 +67,9 @@ class AcquireThread(QtCore.QThread):
 
     def run(self):
         """
-        Main serial thread run routine. First try to open
-        serial port. If that is successful then poll port
-        and return lines of data as they are received.
+        Main serial thread run routine. First try to open serial port. If that
+        is successful then poll port and return lines of data as they are
+        received.
         """
         try:
             self.serial = serial.Serial(self.findSerialPort(),
@@ -142,9 +145,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def on_startButton_clicked(self):
         aq_len = 2000
         command_bytes = \
-            [0x01,                                                  # Command
+            [0x01,                              # Command
              (100 & 0x00FF), (100 >> 8),        # Sample Period (ms)
-             (aq_len & 0x00FF), (aq_len >> 8)]                      # Acquisition Length (1/10th s)
+             (aq_len & 0x00FF), (aq_len >> 8)]  # Acquisition Length (1/10th s)
 
         self.startButton.setEnabled(False)
         self.acquireThread = AcquireThread(command_bytes)
@@ -169,13 +172,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg.exec_()
         self.analyzerWidget.setData(data)
 
-    def on_acquireThread_data(self, data):
-        sep_channel_data = [f(c) for c in data for f in (lambda x: ord(x) >> 4,
-                                                         lambda x: ord(x) & 0x0F)]
-        unpacked_data = [[int(i) for i in list(bin(d)[2:].zfill(4))]
-                         for d in sep_channel_data]
-        packed_data = zip(*unpacked_data)
-        self.analyzerWidget.setData(packed_data)
+    def on_acquireThread_data(self, data_bytes):
+        self.analyzerWidget.setData(
+            models.Acquisition(data_bytes,channel_count=4))
 
     def on_acquireThread_finished(self):
         self.startButton.setEnabled(True)

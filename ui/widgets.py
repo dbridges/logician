@@ -4,16 +4,20 @@ import itertools
 
 from PySide import QtGui, QtCore, QtOpenGL
 
+import models
 
 class AnalyzerWidget(QtGui.QGraphicsView):
+    """
+    The main display widget for the acquired waveforms and their analyzer
+    labels.
+    """
     showMessage = QtCore.Signal(object)
 
     def __init__(self, parent=None):
         super(AnalyzerWidget, self).__init__(parent)
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
-        self.data = [[],[],[],[]]
-        self.channelCount = 4
+        self.data = models.Acquisition([[],[],[],[]])
 
         colors = [QtGui.QColor(0x3C, 0x9D, 0xD0, 255),
                   QtGui.QColor(0xB9, 0x39, 0xD3, 255),
@@ -34,7 +38,12 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.redraw()
 
     def setData(self, data):
-        data.reverse()
+        """
+        Parameters
+        ----------
+        data : Acquisition object
+            An acquisition object holding the channel data.
+        """
         self.data = data
         self.redraw()
 
@@ -63,32 +72,28 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         return super(AnalyzerWidget, self).event(event)
 
     def drawForeground(self, painter, rect):
-        pen = QtGui.QPen(QtGui.QColor(128, 128, 128, 255))
+        """
+        Paints the hud overlay on top of the widget.
+        """
         painter.resetTransform()
-        painter.setPen(pen)
-        #painter.translate(rect.x(), 0)
+        painter.setPen(QtGui.QPen(QtGui.QColor(128, 128, 128, 255)))
 
-        ch_height = self.height() / self.channelCount
+        ch_height = self.height() / self.data.channel_count
 
-        #for n in range(self.channelCount):
-            #painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
-
-        pen.setColor(QtGui.QColor(0, 0, 0, 0))
-        painter.setPen(pen)
+        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0)))
         sidebar_width = 110
         painter.setBrush(QtGui.QBrush(QtGui.QColor(80, 80, 80, 220)))
         painter.drawRect(0, 0, sidebar_width, self.height())
-        pen.setColor(QtGui.QColor(0, 0, 0, 255))
-        painter.setPen(pen)
+        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 255)))
         painter.drawLine(sidebar_width, 0, sidebar_width, self.height())
 
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 255)))
-        for n in range(self.channelCount):
+        for n in range(self.data.channel_count):
             painter.drawText(0, ch_height*n, sidebar_width, ch_height,
                              QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
                              'Channel %d' % n)
 
-        for n in range(self.channelCount):
+        for n in range(self.data.channel_count):
             painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 
     def resizeEvent(self, event):
@@ -96,6 +101,9 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.redraw()
 
     def gestureEvent(self, event):
+        """
+        Override gesutreEvent to provide pinch zooming.
+        """
         if len(self.data[0]) == 0:
             return True
         gesture = event.gesture(QtCore.Qt.PinchGesture)
@@ -105,17 +113,32 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.setScale(new_scale, 1)
         return True
 
-    def setScale(self, new_scale, y_scale=1):
+    def setScale(self, x_scale, y_scale=1):
+        """
+        Sets the display scale, limiting the zoom to zoom no further out than
+        to display the entire waveform.
+
+        Parameters
+        ----------
+        x_scale : float
+            The requested x_scale factor.
+        y_scale : float
+            The requested y_scale factor. This should normally be 1.
+
+        Notes
+        -----
+        An x_scale factor of 1 means that a samples are spaced 1px apart.
+        """
         if len(self.data[0]) != 0:
             min_scale = float(self.width()) / len(self.data[0])
         else:
             min_scale = 1
-        if new_scale > 2:
-            new_scale = 2
-        elif new_scale < min_scale:
-            new_scale = min_scale
+        if x_scale > 2:
+            x_scale = 2
+        elif x_scale < min_scale:
+            x_scale = min_scale
         self.resetTransform()
-        super(AnalyzerWidget, self).scale(new_scale, y_scale)
+        super(AnalyzerWidget, self).scale(x_scale, y_scale)
 
     def mouseMoveEvent(self, event):
         pt = self.mapToScene(event.pos())
@@ -125,6 +148,16 @@ class AnalyzerWidget(QtGui.QGraphicsView):
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
     """
     The view of a single channel, including the waveform and labels.
+
+    Parameters
+    ----------
+    data : array
+        A 1d array of 1's or 0's.
+    height : int
+        The height that the waveform should be drawn, including room
+        for the top margin for label display.
+    pen : QPen
+        A QPen object to draw the waveform with.
     """
     def __init__(self, data, height, pen, parent=None):
         super(AnalyzerChannelGraphicsItem, self).__init__(parent)

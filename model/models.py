@@ -1,0 +1,58 @@
+#!usr/bin/env python
+
+"""
+This file contains the general data storage classes used throughout Logician.
+"""
+
+VALID_CHANNEL_COUNTS = [4]
+
+class Acquisition:
+    """
+    The acqusition object contains data from all of the acquired channels.
+
+    Parameters
+    ----------
+    data : array or bytes or str
+        Array of form [[1, 0, 0, ...], [0, 0, 1, ...], ...]
+        or bytes of data.
+        If data is bytes, channel_count must be provided.
+
+    samplerate : int
+        The acquisition rate in Samples / sec.
+    """
+    def __init__(self, data, sample_rate=1, channel_count=None):
+        if isinstance(data, list):
+            if len(data) not in VALID_CHANNEL_COUNTS:
+                raise ValueError('data must have length %s'
+                                 % str(VALID_CHANNEL_COUNTS))
+            l = len(data[0])
+            for channel in data:
+                if len(channel) != l:
+                    raise ValueError('All channels must be have same length.')
+            self.data = data
+        elif isinstance(data, bytes):
+            if channel_count not in VALID_CHANNEL_COUNTS:
+                raise ValueError('Invalid number of channels.')
+            # Convert byte string to list of 1's and 0's. If there are 4
+            # channels each byte should have 2 4 channel samples in it. The MSB
+            # is the 4th channel of the least recent sample.
+            sep_channel_data = [f(c) for c in data
+                                for f in (lambda x: ord(x) >> 4,
+                                          lambda x: ord(x) & 0x0F)]
+            unpacked_data = [[int(i) for i in list(bin(d)[2:].zfill(4))]
+                            for d in sep_channel_data]
+            self.data = zip(*unpacked_data)
+            self.data.reverse()
+        else:
+            raise TypeError('Invalid data type')
+        self.sample_rate = sample_rate
+        self.channel_count = len(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __iter__(self):
+        return iter(self.data)
