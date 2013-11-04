@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Fri Nov  1 22:23:55 2013
+# Created: Sun Nov  3 21:06:00 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -80,6 +80,9 @@ class Ui_MainWindow(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.topRowLayout.addItem(spacerItem)
         self.verticalLayout.addWidget(self.topRowLayoutWidget)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setSpacing(0)
+        self.horizontalLayout.setObjectName("horizontalLayout")
         self.analyzerWidget = AnalyzerWidget(self.centralwidget)
         self.analyzerWidget.setProperty("cursor", QtCore.Qt.CrossCursor)
         self.analyzerWidget.setMouseTracking(True)
@@ -90,9 +93,13 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(50, 50, 70))
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.analyzerWidget.setBackgroundBrush(brush)
-        self.analyzerWidget.setDragMode(QtGui.QGraphicsView.NoDrag)
+        self.analyzerWidget.setInteractive(False)
+        self.analyzerWidget.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.analyzerWidget.setRenderHints(QtGui.QPainter.TextAntialiasing)
+        self.analyzerWidget.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
         self.analyzerWidget.setObjectName("analyzerWidget")
-        self.verticalLayout.addWidget(self.analyzerWidget)
+        self.horizontalLayout.addWidget(self.analyzerWidget)
+        self.verticalLayout.addLayout(self.horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 911, 22))

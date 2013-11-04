@@ -176,38 +176,54 @@
      </widget>
     </item>
     <item>
-     <widget class="AnalyzerWidget" name="analyzerWidget">
-      <property name="cursor" stdset="0">
-       <cursorShape>CrossCursor</cursorShape>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
       </property>
-      <property name="mouseTracking">
-       <bool>true</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="backgroundBrush">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>50</red>
-         <green>50</green>
-         <blue>70</blue>
-        </color>
-       </brush>
-      </property>
-      <property name="dragMode">
-       <enum>QGraphicsView::NoDrag</enum>
-      </property>
-     </widget>
+      <item>
+       <widget class="AnalyzerWidget" name="analyzerWidget">
+        <property name="cursor" stdset="0">
+         <cursorShape>CrossCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="backgroundBrush">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>50</red>
+           <green>50</green>
+           <blue>70</blue>
+          </color>
+         </brush>
+        </property>
+        <property name="interactive">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="renderHints">
+         <set>QPainter::TextAntialiasing</set>
+        </property>
+        <property name="transformationAnchor">
+         <enum>QGraphicsView::AnchorUnderMouse</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

@@ -2,7 +2,8 @@
 
 import itertools
 
-from PySide import QtGui, QtCore
+from PySide import QtGui, QtCore, QtOpenGL
+
 
 class AnalyzerWidget(QtGui.QGraphicsView):
     showMessage = QtCore.Signal(object)
@@ -22,11 +23,15 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         for n in range(4):
             p = QtGui.QPen()
             p.setColor(colors[n])
-            p.setWidth(0)
+            p.setWidth(0.1)
             self.channelPens.append(p)
 
         self._subviewMargin = 24
         self.grabGesture(QtCore.Qt.PinchGesture)
+        self.setViewport(QtOpenGL.QGLWidget())
+        self.setAutoFillBackground(False)
+        self.viewport().setAutoFillBackground(False)
+        self.redraw()
 
     def setData(self, data):
         data.reverse()
@@ -48,20 +53,25 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.resetTransform()
         self.scene.clear()
         self.drawSignals()
-        self.scale(x_scale, 1)
+        self.setScale(x_scale, 1)
         self.scene.setSceneRect(0, 0, len(self.data[0]),
                                 self.height() - self._subviewMargin/2)
 
-    def paintEvent(self, event):
-        super(AnalyzerWidget, self).paintEvent(event)
-        painter = QtGui.QPainter(self.viewport())
+    def event(self, event):
+        if event.type() == QtCore.QEvent.Gesture:
+            return self.gestureEvent(event)
+        return super(AnalyzerWidget, self).event(event)
+
+    def drawForeground(self, painter, rect):
         pen = QtGui.QPen(QtGui.QColor(128, 128, 128, 255))
+        painter.resetTransform()
         painter.setPen(pen)
+        #painter.translate(rect.x(), 0)
 
-        ch_height = self.height() / len(self.data)
+        ch_height = self.height() / self.channelCount
 
-        for n in range(len(self.data)):
-            painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
+        #for n in range(self.channelCount):
+            #painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 
         pen.setColor(QtGui.QColor(0, 0, 0, 0))
         painter.setPen(pen)
@@ -73,32 +83,39 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         painter.drawLine(sidebar_width, 0, sidebar_width, self.height())
 
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 255)))
-        for n in range(len(self.data)):
+        for n in range(self.channelCount):
             painter.drawText(0, ch_height*n, sidebar_width, ch_height,
                              QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
                              'Channel %d' % n)
 
-    def event(self, event):
-        if event.type() == QtCore.QEvent.Gesture:
-            return self.gestureEvent(event)
-        return super(AnalyzerWidget, self).event(event)
+        for n in range(self.channelCount):
+            painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 
     def resizeEvent(self, event):
-        self.redraw()
         super(AnalyzerWidget, self).resizeEvent(event)
+        self.redraw()
 
     def gestureEvent(self, event):
+        if len(self.data[0]) == 0:
+            return True
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
             x_scale = self.transform().m11()
             new_scale = x_scale * gesture.scaleFactor()
-            if new_scale > 20:
-                new_scale = 20
-            elif new_scale < 0.1:
-                new_scale = 0.1
-            self.resetTransform()
-            self.scale(new_scale, 1)
+            self.setScale(new_scale, 1)
         return True
+
+    def setScale(self, new_scale, y_scale=1):
+        if len(self.data[0]) != 0:
+            min_scale = float(self.width()) / len(self.data[0])
+        else:
+            min_scale = 1
+        if new_scale > 2:
+            new_scale = 2
+        elif new_scale < min_scale:
+            new_scale = min_scale
+        self.resetTransform()
+        super(AnalyzerWidget, self).scale(new_scale, y_scale)
 
     def mouseMoveEvent(self, event):
         pt = self.mapToScene(event.pos())

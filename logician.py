@@ -135,6 +135,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.toolBar.addWidget(self.topRowLayoutWidget)
         self.analyzerWidget.showMessage.connect(self.statusBar.showMessage,
                                     QtCore.Qt.QueuedConnection)
+        self.show()
         self.loadSettings()
 
     @QtCore.Slot()
