@@ -258,8 +258,14 @@
    </attribute>
   </widget>
   <action name="actionSave_to_Spreadsheet">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save to Spreadsheet...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionOpen">

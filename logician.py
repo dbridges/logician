@@ -154,7 +154,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def on_actionOpen_triggered(self):
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open data file.',
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open',
                                                      os.getcwd(),
                                                      "CSV Files (*.csv)")[0]
         if filename == '':
@@ -167,10 +167,27 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg.exec_()
             return
         self.analyzerWidget.setData(data)
+        self.actionSave_to_Spreadsheet.setEnabled(True)
+
+    @QtCore.Slot()
+    def on_actionSave_to_Spreadsheet_triggered(self):
+        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save As',
+                                                     os.getcwd(),
+                                                     "CSV Files (*.csv)")[0]
+        if filename == '':
+            return
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.analyzerWidget.data.csv_string())
+        except IOError as e:
+            msg = QtGui.QMessageBox();
+            msg.setText('There was an error saving the file.')
+            msg.exec_()
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(
             models.Acquisition(data_bytes,channel_count=4))
+        self.actionSave_to_Spreadsheet.setEnabled(True)
 
     def on_acquireThread_finished(self):
         self.startButton.setEnabled(True)

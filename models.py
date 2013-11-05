@@ -47,6 +47,7 @@ class Acquisition:
             raise TypeError('Invalid data type')
         self.sample_rate = sample_rate
         self.channel_count = len(self.data)
+        self.acquisition_length = len(self.data[0])
 
     def __len__(self):
         return len(self.data)
@@ -56,6 +57,13 @@ class Acquisition:
 
     def __iter__(self):
         return iter(self.data)
+
+    def csv_string(self):
+        out_string = '#sample_rate=%d' % self.sample_rate
+        for row in zip(*self.data):
+            out_string += str(row)[1:-1].replace(' ', '')
+            out_string += '\n'
+        return out_string
 
 
 class AnalyzerCommand:
