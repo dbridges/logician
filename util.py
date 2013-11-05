@@ -2,13 +2,14 @@
 
 import csv
 
-def read_csv(fname, unpack=True):
+import models
+
+def read_csv(fname):
     with open(fname, 'rb') as f:
         reader = csv.reader(f)
+        header = next(reader)
+        sample_rate = int(header[0].split('=')[-1])
         data = [[int(d) for d in row] for row in reader
                 if len(row) != 1]
-    if unpack:
-        return zip(*data)
-    else:
-        return data
+    return models.Acquisition(zip(*data), sample_rate)
 

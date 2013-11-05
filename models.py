@@ -56,3 +56,21 @@ class Acquisition:
 
     def __iter__(self):
         return iter(self.data)
+
+
+class AnalyzerCommand:
+    """
+    Simple class to hold analyzer commands and create appropriate command bytes
+    to be sent to the firmware.
+    """
+    def __init__(self, sample_rate=1, sample_count=4000,
+                 trigger_type=0, trigger_channel=0):
+        sp = int(1.0 / sample_rate / 1e-6)
+        self.command_bytes = \
+            [0x01,                              # Command
+             (100 & 0x00FF), (100 >> 8),        # Sample Period (us)
+             (sample_count & 0x00FF), (sample_count >> 8),
+             trigger_type, trigger_channel]
+        self.command_bytes = (''.join([chr(x) for x in self.command_bytes]) +
+                              ' '*(64 - len(self.command_bytes)))
+

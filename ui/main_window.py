@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Sun Nov  3 21:06:00 2013
+# Created: Tue Nov  5 10:07:04 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -135,10 +135,10 @@ class Ui_MainWindow(object):
         self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Sample Rate:", None, QtGui.QApplication.UnicodeUTF8))
         self.sampleRateComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "1 MS/s", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Trigger:", None, QtGui.QApplication.UnicodeUTF8))
-        self.triggerChannelComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Channel 1", None, QtGui.QApplication.UnicodeUTF8))
-        self.triggerChannelComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Channel 2", None, QtGui.QApplication.UnicodeUTF8))
-        self.triggerChannelComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Channel 3", None, QtGui.QApplication.UnicodeUTF8))
-        self.triggerChannelComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "Channel 4", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerChannelComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Channel 0", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerChannelComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Channel 1", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerChannelComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Channel 2", None, QtGui.QApplication.UnicodeUTF8))
+        self.triggerChannelComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "Channel 3", None, QtGui.QApplication.UnicodeUTF8))
         self.triggerSlopeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Rising", None, QtGui.QApplication.UnicodeUTF8))
         self.triggerSlopeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Falling", None, QtGui.QApplication.UnicodeUTF8))
         self.startButton.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))

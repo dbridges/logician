@@ -37,14 +37,14 @@ class AcquireThread(QtCore.QThread):
 
     dataReady = QtCore.Signal(object)
 
-    def __init__(self, command_bytes, parent=None, com_name=None, baud=115200):
+    def __init__(self, command, parent=None, com_name=None, baud=115200):
         super(AcquireThread, self).__init__()
         self._running = False
         self.serial = None
         self.serialStatusOk = False
         self.baud = baud
         self.com_name = com_name
-        self.command_bytes = command_bytes
+        self.command = command
 
     def findSerialPort(self):
         """
@@ -86,9 +86,7 @@ class AcquireThread(QtCore.QThread):
         self.serial.flushInput()
         self.serial.flushOutput()
 
-        out_string = (''.join([chr(x) for x in self.command_bytes]) +
-            ' '*(64 - len(self.command_bytes)))    #Pad string to 64 bytes
-        self.serial.write(out_string)
+        self.serial.write(self.command.command_bytes)
 
         while self._running:
             # Wait for data to arrive
@@ -143,14 +141,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def on_startButton_clicked(self):
-        aq_len = 2000
-        command_bytes = \
-            [0x01,                              # Command
-             (100 & 0x00FF), (100 >> 8),        # Sample Period (ms)
-             (aq_len & 0x00FF), (aq_len >> 8)]  # Acquisition Length (1/10th s)
-
         self.startButton.setEnabled(False)
-        self.acquireThread = AcquireThread(command_bytes)
+        self.acquireThread = AcquireThread(
+            models.AnalyzerCommand(
+                trigger_type=self.triggerSlopeComboBox.currentIndex(),
+                trigger_channel=self.triggerChannelComboBox.currentIndex()))
         self.acquireThread.dataReady.connect(self.on_acquireThread_data,
                                              QtCore.Qt.QueuedConnection)
         self.acquireThread.finished.connect(self.on_acquireThread_finished,
@@ -170,6 +165,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg = QtGui.QMessageBox();
             msg.setText('Error loading file.')
             msg.exec_()
+            return
         self.analyzerWidget.setData(data)
 
     def on_acquireThread_data(self, data_bytes):
