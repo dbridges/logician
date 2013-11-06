@@ -209,21 +209,34 @@
           </color>
          </brush>
         </property>
-        <property name="interactive">
-         <bool>false</bool>
-        </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
         <property name="renderHints">
          <set>QPainter::TextAntialiasing</set>
         </property>
-        <property name="transformationAnchor">
-         <enum>QGraphicsView::AnchorUnderMouse</enum>
-        </property>
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QComboBox" name="displayTypeComboBox">
+      <item>
+       <property name="text">
+        <string>Ascii</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Hex</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Decimal</string>
+       </property>
+      </item>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -245,7 +258,13 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+  </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>

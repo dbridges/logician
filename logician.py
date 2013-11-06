@@ -134,6 +134,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.acquireThread = None
         self.setupUi(self)
         self.toolBar.addWidget(self.topRowLayoutWidget)
+        self.statusBar.addPermanentWidget(self.displayTypeComboBox)
         self.analyzerWidget.showMessage.connect(self.statusBar.showMessage,
                                     QtCore.Qt.QueuedConnection)
         self.show()

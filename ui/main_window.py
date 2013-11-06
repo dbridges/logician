@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Tue Nov  5 10:48:04 2013
+# Created: Tue Nov  5 21:01:14 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -93,13 +93,17 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(50, 50, 70))
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.analyzerWidget.setBackgroundBrush(brush)
-        self.analyzerWidget.setInteractive(False)
         self.analyzerWidget.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.analyzerWidget.setRenderHints(QtGui.QPainter.TextAntialiasing)
-        self.analyzerWidget.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
         self.analyzerWidget.setObjectName("analyzerWidget")
         self.horizontalLayout.addWidget(self.analyzerWidget)
         self.verticalLayout.addLayout(self.horizontalLayout)
+        self.displayTypeComboBox = QtGui.QComboBox(self.centralwidget)
+        self.displayTypeComboBox.setObjectName("displayTypeComboBox")
+        self.displayTypeComboBox.addItem("")
+        self.displayTypeComboBox.addItem("")
+        self.displayTypeComboBox.addItem("")
+        self.verticalLayout.addWidget(self.displayTypeComboBox)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 911, 22))
@@ -108,6 +112,9 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         self.statusBar = QtGui.QStatusBar(MainWindow)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.statusBar.setFont(font)
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
         self.toolBar = QtGui.QToolBar(MainWindow)
@@ -143,6 +150,9 @@ class Ui_MainWindow(object):
         self.triggerSlopeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Rising", None, QtGui.QApplication.UnicodeUTF8))
         self.triggerSlopeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Falling", None, QtGui.QApplication.UnicodeUTF8))
         self.startButton.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayTypeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Ascii", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayTypeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Hex", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayTypeComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Decimal", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSave_to_Spreadsheet.setText(QtGui.QApplication.translate("MainWindow", "Save to Spreadsheet...", None, QtGui.QApplication.UnicodeUTF8))

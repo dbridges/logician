@@ -27,7 +27,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         for n in range(4):
             p = QtGui.QPen()
             p.setColor(colors[n])
-            p.setWidth(0.1)
+            p.setWidth(2)
+            p.setCosmetic(True)
             self.channelPens.append(p)
 
         self._subviewMargin = 24
@@ -142,7 +143,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
 
     def mouseMoveEvent(self, event):
         pt = self.mapToScene(event.pos())
-        self.showMessage.emit('%f, %f' % (pt.x(), pt.y()))
+        self.showMessage.emit('%0.2f' % pt.x())
 
 
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
