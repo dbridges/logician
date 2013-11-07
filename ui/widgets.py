@@ -32,6 +32,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.channelPens.append(p)
 
         self._subviewMargin = 24
+        self._widthMeasurementCoords = None
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
         self.setAutoFillBackground(False)
@@ -77,6 +78,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         Paints the hud overlay on top of the widget.
         """
         painter.resetTransform()
+        painter.setPen(QtGui.QPen(QtGui.QColor(228, 228, 228, 255)))
+        self.drawWidthMeasurement(painter)
         painter.setPen(QtGui.QPen(QtGui.QColor(128, 128, 128, 255)))
 
         ch_height = self.height() / self.data.channel_count
@@ -97,6 +100,18 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         for n in range(self.data.channel_count):
             painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 
+    def drawWidthMeasurement(self, painter):
+        if self._widthMeasurementCoords is None:
+            return
+        waveformHeight = self.height() / len(self.data)
+        y = (self._widthMeasurementCoords[0] * waveformHeight
+             + (waveformHeight / 2))
+        x1 = self._widthMeasurementCoords[1] + 3
+        x2 = self._widthMeasurementCoords[2] - 2
+        painter.drawLine(x1, y, x2, y)
+        painter.drawLine(x1, y-3, x1, y+3)
+        painter.drawLine(x2, y-3, x2, y+3)
+
     def resizeEvent(self, event):
         super(AnalyzerWidget, self).resizeEvent(event)
         self.redraw()
@@ -107,6 +122,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         if len(self.data[0]) == 0:
             return True
+        self._widthMeasurementCoords = None
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
             x_scale = self.transform().m11()
@@ -145,7 +161,6 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         if len(self.data[0]) < 1:
             return
         pt = self.mapToScene(event.pos())
-        self.showMessage.emit('%g' % (pt.x() * self.data.dt))
         # Find transition points on either side of mouse pos.
         waveform_i = int(pt.y() // (self.height() / len(self.data)))
         index = int(pt.x())
@@ -159,11 +174,24 @@ class AnalyzerWidget(QtGui.QGraphicsView):
                self.data[waveform_i][finish_index] ==
                self.data[waveform_i][index]):
                finish_index += 1
-        self.scene.addLine(start_index,
-                           waveform_i * self.height() / len(self.data) + 80,
-                           finish_index,
-                           waveform_i * self.height() / len(self.data) + 80,
-                           QtGui.QPen(QtGui.QColor(228, 228, 228, 255)))
+
+        self._widthMeasurementCoords = \
+            [waveform_i,
+             self.mapFromScene(start_index, 0).x(),
+             self.mapFromScene(finish_index, 0).x()]
+        t = pt.x() * self.data.dt
+        dt = (finish_index - start_index - 1 ) * self.data.dt
+        # Choose correct units for display
+        if t < 1e-3:
+            msg = 't: %0d us' % int(1e6*t)
+        else:
+            msg = 't: %0.2f ms' % (1e3*t)
+        if dt < 1e-3:
+            msg += '    dt: %d us' % int(1e6*dt)
+        else:
+            msg += '    dt: %0.2f ms' % (1e3*dt)
+        self.showMessage.emit(msg)
+        self.update()
 
 
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
@@ -205,3 +233,34 @@ class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
         self.waveformPathItem = QtGui.QGraphicsPathItem(path, self)
         self.waveformPathItem.setPen(pen)
         self.addToGroup(self.waveformPathItem)
+
+class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
+    """
+    Draws an arrow from x1, y1 to x2, y2
+    """
+    def __init__(self, x1, y1, x2, y2,
+                 pen=QtGui.QPen(QtGui.QColor(255, 255, 255, 255))):
+        super(HorizontalArrowGraphicsItem, self).__init__()
+        self._coords = [x1, y1, x2, y2]
+        self._height = 10
+        self.pen = pen
+
+    def paint(self, painter, option, widget):
+        painter.setPen(self.pen)
+        painter.drawLine(*self._coords)
+        painter.drawLine(self._coords[0],
+                         self._coords[1] - self._height / 2,
+                         self._coords[0],
+                         self._coords[1] + self._height / 2)
+        painter.drawLine(self._coords[2],
+                         self._coords[1] - self._height / 2,
+                         self._coords[2],
+                         self._coords[1] + self._height / 2)
+
+    def boundingRect(self):
+        return QtCore.QRectF(self._coords[0],
+                             self._coords[1] - self._height/2,
+                             self._coords[2] - self._coords[0],
+                             self._height)
+
+
