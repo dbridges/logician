@@ -46,6 +46,7 @@ class Acquisition:
         else:
             raise TypeError('Invalid data type')
         self.sample_rate = sample_rate
+        self.dt = 1.0 / sample_rate
         self.channel_count = len(self.data)
         self.acquisition_length = len(self.data[0])
 

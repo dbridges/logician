@@ -128,7 +128,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
 
         Notes
         -----
-        An x_scale factor of 1 means that a samples are spaced 1px apart.
+        An x_scale factor of 1 means that samples are spaced 1px apart.
         """
         if len(self.data[0]) != 0:
             min_scale = float(self.width()) / len(self.data[0])
@@ -142,8 +142,28 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         super(AnalyzerWidget, self).scale(x_scale, y_scale)
 
     def mouseMoveEvent(self, event):
+        if len(self.data[0]) < 1:
+            return
         pt = self.mapToScene(event.pos())
-        self.showMessage.emit('%0.2f' % pt.x())
+        self.showMessage.emit('%g' % (pt.x() * self.data.dt))
+        # Find transition points on either side of mouse pos.
+        waveform_i = int(pt.y() // (self.height() / len(self.data)))
+        index = int(pt.x())
+        start_index = index
+        finish_index = index
+        while (start_index > 0 and
+               self.data[waveform_i][start_index] ==
+               self.data[waveform_i][index]):
+               start_index -= 1
+        while (finish_index < self.data.acquisition_length and
+               self.data[waveform_i][finish_index] ==
+               self.data[waveform_i][index]):
+               finish_index += 1
+        self.scene.addLine(start_index,
+                           waveform_i * self.height() / len(self.data) + 80,
+                           finish_index,
+                           waveform_i * self.height() / len(self.data) + 80,
+                           QtGui.QPen(QtGui.QColor(228, 228, 228, 255)))
 
 
 class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
