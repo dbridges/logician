@@ -72,7 +72,7 @@ class AnalyzerCommand:
     Simple class to hold analyzer commands and create appropriate command bytes
     to be sent to the firmware.
     """
-    def __init__(self, sample_rate=1e6, sample_count=4000,
+    def __init__(self, sample_rate=1e6, sample_count=60000,
                  trigger_type=0, trigger_channel=0):
         sp = int(1.0 / sample_rate / 1e-6)
         self.command_bytes = \

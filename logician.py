@@ -187,7 +187,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(
-            models.Acquisition(data_bytes,channel_count=4))
+            models.Acquisition(data_bytes, sample_rate = 1e6, channel_count=4))
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     def on_acquireThread_finished(self):
