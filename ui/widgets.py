@@ -32,7 +32,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.channelPens.append(p)
 
         self._subviewMargin = 24
-        self._widthMeasurementCoords = None
+        self._pulseWidthCoords = None
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
         self.setAutoFillBackground(False)
@@ -101,13 +101,13 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 
     def drawWidthMeasurement(self, painter):
-        if self._widthMeasurementCoords is None:
+        if self._pulseWidthCoords is None:
             return
         waveformHeight = self.height() / len(self.data)
-        y = (self._widthMeasurementCoords[0] * waveformHeight
+        y = (self._pulseWidthCoords[0] * waveformHeight
              + (waveformHeight / 2))
-        x1 = self._widthMeasurementCoords[1] + 3
-        x2 = self._widthMeasurementCoords[2] - 2
+        x1 = self._pulseWidthCoords[1] + 3
+        x2 = self._pulseWidthCoords[2] - 2
         painter.drawLine(x1, y, x2, y)
         painter.drawLine(x1, y-3, x1, y+3)
         painter.drawLine(x2, y-3, x2, y+3)
@@ -122,7 +122,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         if len(self.data[0]) == 0:
             return True
-        self._widthMeasurementCoords = None
+        self._pulseWidthCoords = None
         gesture = event.gesture(QtCore.Qt.PinchGesture)
         if gesture:
             x_scale = self.transform().m11()
@@ -175,7 +175,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
                self.data[waveform_i][index]):
                finish_index += 1
 
-        self._widthMeasurementCoords = \
+        self._pulseWidthCoords = \
             [waveform_i,
              self.mapFromScene(start_index, 0).x(),
              self.mapFromScene(finish_index, 0).x()]
