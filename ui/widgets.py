@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import itertools
 
 from PySide import QtGui, QtCore, QtOpenGL
@@ -50,7 +48,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.redraw()
 
     def drawSignals(self):
-        if len(self.data[0]) == 0:
+        if self.data.acquisition_length == 0:
             return
         subviewHeight = self.height() / 4 - self._subviewMargin / 2
         for i, data in enumerate(self.data):
@@ -65,7 +63,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.scene.clear()
         self.drawSignals()
         self.setScale(x_scale, 1)
-        self.scene.setSceneRect(0, 0, len(self.data[0]),
+        self.scene.setSceneRect(0, 0, self.data.acquisition_length,
                                 self.height() - self._subviewMargin/2)
 
     def event(self, event):
@@ -103,7 +101,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def drawWidthMeasurement(self, painter):
         if self._pulseWidthCoords is None:
             return
-        waveformHeight = self.height() / len(self.data)
+        waveformHeight = self.height() / self.data.channel_count
         y = (self._pulseWidthCoords[0] * waveformHeight
              + (waveformHeight / 2))
         x1 = self._pulseWidthCoords[1] + 3
@@ -120,7 +118,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         Override gesutreEvent to provide pinch zooming.
         """
-        if len(self.data[0]) == 0:
+        if self.data.acquisition_length == 0:
             return True
         self._pulseWidthCoords = None
         gesture = event.gesture(QtCore.Qt.PinchGesture)
@@ -146,8 +144,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         -----
         An x_scale factor of 1 means that samples are spaced 1px apart.
         """
-        if len(self.data[0]) != 0:
-            min_scale = float(self.width()) / len(self.data[0])
+        if self.data.acquisition_length != 0:
+            min_scale = float(self.width()) / self.data.acquisition_length
         else:
             min_scale = 1
         if x_scale > 2:
@@ -158,11 +156,11 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         super(AnalyzerWidget, self).scale(x_scale, y_scale)
 
     def mouseMoveEvent(self, event):
-        if len(self.data[0]) < 1:
+        if self.data.acquisition_length < 1:
             return
         pt = self.mapToScene(event.pos())
         # Find transition points on either side of mouse pos.
-        waveform_i = int(pt.y() // (self.height() / len(self.data)))
+        waveform_i = int(pt.y() // (self.height() / self.data.channel_count))
         index = int(pt.x())
         start_index = index
         finish_index = index

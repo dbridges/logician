@@ -1,8 +1,7 @@
-#!usr/bin/env python
-
 """
 This file contains the general data storage classes used throughout Logician.
 """
+import csv
 
 VALID_CHANNEL_COUNTS = [4]
 
@@ -43,12 +42,41 @@ class Acquisition:
                             for d in sep_channel_data]
             self.data = zip(*unpacked_data)
             self.data.reverse()
+        elif isinstance(data, str) or isinstance(data, unicode):
+            self.load_csv_file(data)
+            return
         else:
             raise TypeError('Invalid data type')
         self.sample_rate = sample_rate
-        self.dt = 1.0 / sample_rate
-        self.channel_count = len(self.data)
-        self.acquisition_length = len(self.data[0])
+
+    @property
+    def dt(self):
+        return 1.0 / self.sample_rate
+
+    @property
+    def acquisition_length(self):
+        return len(self.data[0])
+
+    @property
+    def channel_count(self):
+        return len(self.data)
+
+    def csv_string(self):
+        out_string = '#sample_rate=%d' % self.sample_rate
+        for row in zip(*self.data):
+            out_string += str(row)[1:-1].replace(' ', '')
+            out_string += '\n'
+        return out_string
+
+    def load_csv_file(self, fname):
+        with open(fname, 'rb') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            sample_rate = int(header[0].split('=')[-1])
+            data = [[int(d) for d in row] for row in reader
+                    if len(row) != 1]
+        self.data = zip(*data)
+        self.sample_rate = sample_rate
 
     def __len__(self):
         return len(self.data)
@@ -59,12 +87,6 @@ class Acquisition:
     def __iter__(self):
         return iter(self.data)
 
-    def csv_string(self):
-        out_string = '#sample_rate=%d' % self.sample_rate
-        for row in zip(*self.data):
-            out_string += str(row)[1:-1].replace(' ', '')
-            out_string += '\n'
-        return out_string
 
 
 class AnalyzerCommand:

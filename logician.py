@@ -9,7 +9,6 @@ import serial
 from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
-import util
 import models
 from ui.main_window import Ui_MainWindow
 
@@ -161,11 +160,12 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         if filename == '':
             return
         try:
-            data = util.read_csv(filename)
-        except:
+            data = models.Acquisition(filename)
+        except Exception as e:
             msg = QtGui.QMessageBox();
             msg.setText('Error loading file.')
             msg.exec_()
+
             return
         self.analyzerWidget.setData(data)
         self.actionSave_to_Spreadsheet.setEnabled(True)

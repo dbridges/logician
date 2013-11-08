@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 An Analyzer class should take an Acquisition object and return a list of labels
 and their resepective locations: [(10, 'A'), (8, 'B'), ...].
