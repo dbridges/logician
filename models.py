@@ -5,6 +5,7 @@ import csv
 
 VALID_CHANNEL_COUNTS = [4]
 
+
 class Acquisition:
     """
     The acqusition object contains data from all of the acquired channels.
@@ -39,7 +40,7 @@ class Acquisition:
                                 for f in (lambda x: ord(x) >> 4,
                                           lambda x: ord(x) & 0x0F)]
             unpacked_data = [[int(i) for i in list(bin(d)[2:].zfill(4))]
-                            for d in sep_channel_data]
+                             for d in sep_channel_data]
             self.data = zip(*unpacked_data)
             self.data.reverse()
         elif isinstance(data, str) or isinstance(data, unicode):
@@ -88,7 +89,6 @@ class Acquisition:
         return iter(self.data)
 
 
-
 class AnalyzerCommand:
     """
     Simple class to hold analyzer commands and create appropriate command bytes
@@ -104,4 +104,3 @@ class AnalyzerCommand:
              trigger_type, trigger_channel]
         self.command_bytes = (''.join([chr(x) for x in self.command_bytes]) +
                               ' '*(64 - len(self.command_bytes)))
-

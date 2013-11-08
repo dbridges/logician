@@ -7,8 +7,8 @@ All analyzer class should take these values in their constructors:
 
 """
 
-import itertools
-import sys
+from itertools import groupby
+
 
 class USARTAnalyzer:
     """
@@ -36,13 +36,21 @@ class USARTAnalyzer:
             self.baud = baud
             self.bit_size = int(acquisition.sample_rate / self.baud)
 
-    def _autobaud():
-        min_len = sys.maxint
-        fot k, g in itertools.groupby(self.acquisition[0]):
-            l = len(g)
-            if l < min_len:
-                min_len = l
-        self.bit_size = min_len
+    def _autobaud(self):
+        """
+        Attempts to find the size of 1 bit in the acquired data by looking for
+        the shortest number of continuous values.
+
+        Notes
+        -----
+        This algorithim may be inaccurate if the data does not contain isolated
+        bits. For example if the decimal value 51 (0b00110011) was transmited
+        the calculated autobaud would be inaccurate by a factor of two.
+        """
+        # Find smallest length of continuous values, this is
+        rx_bit_s = min([len(list(g)) for k, g in groupby(self.acquisition[0])])
+        tx_bit_s = min([len(list(g)) for k, g in groupby(self.acquisition[1])])
+        self.bit_size = min(rx_bit_s, tx_bit_s)
 
     def labels(self):
         pass

@@ -1,8 +1,7 @@
-import itertools
-
 from PySide import QtGui, QtCore, QtOpenGL
 
 import models
+
 
 class AnalyzerWidget(QtGui.QGraphicsView):
     """
@@ -15,7 +14,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         super(AnalyzerWidget, self).__init__(parent)
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
-        self.data = models.Acquisition([[],[],[],[]])
+        self.data = models.Acquisition([[], [], [], []])
 
         colors = [QtGui.QColor(0x3C, 0x9D, 0xD0, 255),
                   QtGui.QColor(0xB9, 0x39, 0xD3, 255),
@@ -102,10 +101,10 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         if self._pulseWidthCoords is None:
             return
         waveformHeight = self.height() / self.data.channel_count
-        y = (self._pulseWidthCoords[0] * waveformHeight
+        y = (self._pulseWidthCoords['waveform_pos'] * waveformHeight
              + (waveformHeight / 2))
-        x1 = self._pulseWidthCoords[1] + 3
-        x2 = self._pulseWidthCoords[2] - 2
+        x1 = self._pulseWidthCoords['x1'] + 3
+        x2 = self._pulseWidthCoords['x2'] - 2
         painter.drawLine(x1, y, x2, y)
         painter.drawLine(x1, y-3, x1, y+3)
         painter.drawLine(x2, y-3, x2, y+3)
@@ -160,25 +159,25 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             return
         pt = self.mapToScene(event.pos())
         # Find transition points on either side of mouse pos.
-        waveform_i = int(pt.y() // (self.height() / self.data.channel_count))
+        waveform_pos = int(pt.y() // (self.height() / self.data.channel_count))
         index = int(pt.x())
         start_index = index
         finish_index = index
         while (start_index > 0 and
-               self.data[waveform_i][start_index] ==
-               self.data[waveform_i][index]):
-               start_index -= 1
+                self.data[waveform_pos][start_index] ==
+                self.data[waveform_pos][index]):
+                start_index -= 1
         while (finish_index < self.data.acquisition_length and
-               self.data[waveform_i][finish_index] ==
-               self.data[waveform_i][index]):
-               finish_index += 1
+                self.data[waveform_pos][finish_index] ==
+                self.data[waveform_pos][index]):
+                finish_index += 1
 
-        self._pulseWidthCoords = \
-            [waveform_i,
-             self.mapFromScene(start_index, 0).x(),
-             self.mapFromScene(finish_index, 0).x()]
+        self._pulseWidthCoords = {
+            'waveform_pos': waveform_pos,
+            'x1': self.mapFromScene(start_index, 0).x(),
+            'x2': self.mapFromScene(finish_index, 0).x()}
         t = pt.x() * self.data.dt
-        dt = (finish_index - start_index - 1 ) * self.data.dt
+        dt = (finish_index - start_index - 1) * self.data.dt
         # Choose correct units for display
         if t < 1e-3:
             msg = 't: %0d us' % int(1e6*t)
@@ -227,10 +226,10 @@ class AnalyzerChannelGraphicsItem(QtGui.QGraphicsItemGroup):
                 path.lineTo(x, -y*waveformHeight)
         path.translate(0, waveformHeight + topMargin)
 
-
         self.waveformPathItem = QtGui.QGraphicsPathItem(path, self)
         self.waveformPathItem.setPen(pen)
         self.addToGroup(self.waveformPathItem)
+
 
 class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
     """
@@ -260,5 +259,3 @@ class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
                              self._coords[1] - self._height/2,
                              self._coords[2] - self._coords[0],
                              self._height)
-
-

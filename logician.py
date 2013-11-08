@@ -2,7 +2,6 @@
 
 import sys
 import os
-import random
 import time
 
 import serial
@@ -11,6 +10,7 @@ from PySide import QtGui, QtCore
 
 import models
 from ui.main_window import Ui_MainWindow
+
 
 class AcquireThread(QtCore.QThread):
     """
@@ -49,7 +49,7 @@ class AcquireThread(QtCore.QThread):
         """
         Returns a serial port string to connect to.
         """
-        if self.com_name == None:
+        if self.com_name is None:
             try:
                 com = ''
                 for item in list_ports.comports():
@@ -115,7 +115,7 @@ class AcquireThread(QtCore.QThread):
         preventing possible errors by a quick kill.
         """
         self._running = False
-        if self.serial != None:
+        if self.serial is not None:
             self.serial.close()
             self.finished.emit()
             self.exit()
@@ -134,8 +134,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.toolBar.addWidget(self.topRowLayoutWidget)
         self.statusBar.addPermanentWidget(self.displayTypeComboBox)
-        self.analyzerWidget.showMessage.connect(self.statusBar.showMessage,
-                                    QtCore.Qt.QueuedConnection)
+        self.analyzerWidget.showMessage.connect(
+            self.statusBar.showMessage, QtCore.Qt.QueuedConnection)
         self.show()
         self.loadSettings()
 
@@ -161,8 +161,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             return
         try:
             data = models.Acquisition(filename)
-        except Exception as e:
-            msg = QtGui.QMessageBox();
+        except:
+            msg = QtGui.QMessageBox()
             msg.setText('Error loading file.')
             msg.exec_()
 
@@ -180,14 +180,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         try:
             with open(filename, 'w') as f:
                 f.write(self.analyzerWidget.data.csv_string())
-        except IOError as e:
-            msg = QtGui.QMessageBox();
+        except IOError:
+            msg = QtGui.QMessageBox()
             msg.setText('There was an error saving the file.')
             msg.exec_()
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(
-            models.Acquisition(data_bytes, sample_rate = 1e6, channel_count=4))
+            models.Acquisition(data_bytes, sample_rate=1e6, channel_count=4))
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     def on_acquireThread_finished(self):
@@ -201,8 +201,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             if settings.value('maximized', 'false') == 'true':
                 self.showMaximized()
             settings.endGroup()
-        except Exception as e:
-            logging.error('Error loading gui settings. %s' % str(e))
+        except:
+            pass
 
     def saveSettings(self):
         settings = QtCore.QSettings('dbridges', 'Logician')
