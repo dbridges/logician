@@ -8,7 +8,8 @@ import serial
 from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
-import models
+from models import Acquisition, AnalyzerCommand
+
 from ui.main_window import Ui_MainWindow
 
 
@@ -73,7 +74,7 @@ class AcquireThread(QtCore.QThread):
         try:
             self.serial = serial.Serial(self.findSerialPort(),
                                         115200,
-                                        timeout=0.4)
+                                        timeout=10)
         except:
             self.serialStatusOk = False
             self._running = False
@@ -97,12 +98,13 @@ class AcquireThread(QtCore.QThread):
                     self.serial.close()
                     return False
             # Read incoming data
-            new_data = self.serial.read(128)
-            while len(new_data) == 128:
-                serial_buffer += new_data
-                new_data = self.serial.read(128)
-                self.msleep(5)
-            serial_buffer += new_data
+            #new_data = self.serial.read(128)
+            #while len(new_data) == 128:
+                #serial_buffer += new_data
+                #new_data = self.serial.read(128)
+                #self.msleep(5)
+            #serial_buffer += new_data
+            serial_buffer = self.serial.read(self.command.sample_count / 2)
 
             self.dataReady.emit(serial_buffer)
             self._running = False
@@ -132,7 +134,12 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.app = parent_app
         self.acquireThread = None
         self.setupUi(self)
+        for key in AnalyzerCommand.sample_counts:
+            self.sampleCountComboBox.addItem(key)
+        for key in AnalyzerCommand.sample_rates:
+            self.sampleRateComboBox.addItem(key)
         self.toolBar.addWidget(self.topRowLayoutWidget)
+        self.statusBar.addPermanentWidget(self.protocolComboBox)
         self.statusBar.addPermanentWidget(self.displayTypeComboBox)
         self.analyzerWidget.showMessage.connect(
             self.statusBar.showMessage, QtCore.Qt.QueuedConnection)
@@ -143,7 +150,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def on_startButton_clicked(self):
         self.startButton.setEnabled(False)
         self.acquireThread = AcquireThread(
-            models.AnalyzerCommand(
+            AnalyzerCommand(
+                AnalyzerCommand.sample_rates[
+                    self.sampleRateComboBox.currentText()],
+                AnalyzerCommand.sample_counts[
+                    self.sampleCountComboBox.currentText()],
                 trigger_type=self.triggerSlopeComboBox.currentIndex(),
                 trigger_channel=self.triggerChannelComboBox.currentIndex()))
         self.acquireThread.dataReady.connect(self.on_acquireThread_data,
@@ -160,7 +171,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         if filename == '':
             return
         try:
-            data = models.Acquisition(filename)
+            data = Acquisition(filename)
         except:
             msg = QtGui.QMessageBox()
             msg.setText('Error loading file.')
@@ -187,7 +198,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(
-            models.Acquisition(data_bytes, sample_rate=1e6, channel_count=4))
+            Acquisition(data_bytes, sample_rate=1e6, channel_count=4))
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     def on_acquireThread_finished(self):

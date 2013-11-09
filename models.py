@@ -2,6 +2,7 @@
 This file contains the general data storage classes used throughout Logician.
 """
 import csv
+from collections import OrderedDict
 
 VALID_CHANNEL_COUNTS = [4]
 
@@ -94,9 +95,22 @@ class AnalyzerCommand:
     Simple class to hold analyzer commands and create appropriate command bytes
     to be sent to the firmware.
     """
-    def __init__(self, sample_rate=1e6, sample_count=60000,
+    sample_counts = OrderedDict((('200K', 200000),
+                                 ('100K', 100000),
+                                 ('50K', 50000),
+                                 ('10K', 10000),
+                                 ('2K', 2000)))
+    sample_rates = OrderedDict((('1 MS/s', 1000000),
+                                ('500 KS/s', 500000),
+                                ('200 KS/s', 200000),
+                                ('100 KS/s', 10000)))
+
+    def __init__(self, sample_rate=1e6, sample_count=64000,
                  trigger_type=0, trigger_channel=0):
         sp = int(1.0 / sample_rate / 1e-6)
+        self.sample_count = sample_count
+        self.sample_rate = sample_rate
+        sample_count /= 1000
         self.command_bytes = \
             [0x01,                              # Command
              (sp & 0x00FF), (sp >> 8),          # Sample Period (us)

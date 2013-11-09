@@ -31,6 +31,22 @@
         <number>12</number>
        </property>
        <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Sample Rate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="sampleRateComboBox">
+         <property name="font">
+          <font>
+           <stylestrategy>PreferAntialias</stylestrategy>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -44,73 +60,17 @@
           </font>
          </property>
          <property name="text">
-          <string>Protocol:</string>
+          <string>Sample Count</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="protocolComboBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>13</pointsize>
-          </font>
-         </property>
-         <property name="toolTip">
-          <string>Select a suitable communication protocol.</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>General I/O</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>I2C</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>SPI</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>USART</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Sample Rate:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="sampleRateComboBox">
-         <property name="font">
-          <font>
-           <stylestrategy>PreferAntialias</stylestrategy>
-          </font>
-         </property>
-         <item>
-          <property name="text">
-           <string>1 MS/s</string>
-          </property>
-         </item>
-        </widget>
+        <widget class="QComboBox" name="sampleCountComboBox"/>
        </item>
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Trigger:</string>
+          <string>Trigger</string>
          </property>
         </widget>
        </item>
@@ -218,6 +178,39 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QComboBox" name="protocolComboBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>Select a suitable communication protocol.</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>General I/O</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>I2C</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SPI</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>USART</string>
+       </property>
+      </item>
+     </widget>
     </item>
     <item>
      <widget class="QComboBox" name="displayTypeComboBox">
