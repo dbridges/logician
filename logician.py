@@ -9,6 +9,7 @@ from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
 from models import Acquisition, AnalyzerCommand
+import analyzers
 
 from ui.main_window import Ui_MainWindow
 
@@ -207,6 +208,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg = QtGui.QMessageBox()
             msg.setText('There was an error saving the file.')
             msg.exec_()
+
+    @QtCore.Slot()
+    def on_protocolComboBox_currentIndexChanged(self):
+        self.analyzerWidget.setWaveformLabels(
+            analyzers.labels(self.protocolComboBox.currentText()))
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(

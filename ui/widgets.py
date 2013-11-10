@@ -1,6 +1,7 @@
 from PySide import QtGui, QtCore, QtOpenGL
 
 import models
+import analyzers
 
 
 class AnalyzerWidget(QtGui.QGraphicsView):
@@ -30,6 +31,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
 
         self._subviewMargin = 24
         self._pulseWidthCoords = None
+        self.waveformLabels = analyzers.labels('')
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
         self.setAutoFillBackground(False)
@@ -45,6 +47,10 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         self.data = data
         self.redraw()
+
+    def setWaveformLabels(self, labels):
+        self.waveformLabels = labels
+        self.update()
 
     def drawSignals(self):
         if self.data.acquisition_length == 0:
@@ -92,7 +98,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         for n in range(self.data.channel_count):
             painter.drawText(0, ch_height*n, sidebar_width, ch_height,
                              QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
-                             'Channel %d' % n)
+                             self.waveformLabels[n])
 
         for n in range(self.data.channel_count):
             painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
