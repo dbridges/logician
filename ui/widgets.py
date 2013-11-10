@@ -145,10 +145,12 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         if self.data.acquisition_length != 0:
             min_scale = float(self.width()) / self.data.acquisition_length
+            max_scale = float(self.width()) / 20
         else:
+            max_scale = 2
             min_scale = 1
-        if x_scale > 2:
-            x_scale = 2
+        if x_scale > max_scale:
+            x_scale = max_scale
         elif x_scale < min_scale:
             x_scale = min_scale
         self.resetTransform()

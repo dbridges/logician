@@ -143,6 +143,18 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.statusBar.addPermanentWidget(self.displayTypeComboBox)
         self.analyzerWidget.showMessage.connect(
             self.statusBar.showMessage, QtCore.Qt.QueuedConnection)
+        self.comboBoxes = {'sampleRateIndex':
+                           self.sampleRateComboBox,
+                           'sampleCountIndex':
+                           self.sampleCountComboBox,
+                           'triggerChannelIndex':
+                           self.triggerChannelComboBox,
+                           'triggerSlopeIndex':
+                           self.triggerSlopeComboBox,
+                           'protocolIndex':
+                           self.protocolComboBox,
+                           'displayTypeIndex':
+                           self.displayTypeComboBox}
         self.show()
         self.loadSettings()
 
@@ -211,6 +223,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self.restoreGeometry(settings.value('geometry'))
             if settings.value('maximized', 'false') == 'true':
                 self.showMaximized()
+            for k in self.comboBoxes:
+                self.comboBoxes[k].setCurrentIndex(settings.value(k, 0))
             settings.endGroup()
         except:
             pass
@@ -220,6 +234,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         settings.beginGroup('MainWindow')
         settings.setValue('geometry', self.saveGeometry())
         settings.setValue('maximized', self.isMaximized())
+        for k in self.comboBoxes:
+            settings.setValue(k, self.comboBoxes[k].currentIndex())
         settings.endGroup()
 
     def closeEvent(self, event):
