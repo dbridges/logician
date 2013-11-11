@@ -175,6 +175,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
                 self.data[waveform_pos][start_index] ==
                 self.data[waveform_pos][index]):
                 start_index -= 1
+        start_index += 1
         while (finish_index < self.data.acquisition_length and
                 self.data[waveform_pos][finish_index] ==
                 self.data[waveform_pos][index]):

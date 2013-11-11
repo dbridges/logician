@@ -98,13 +98,6 @@ class AcquireThread(QtCore.QThread):
                     self._running = False
                     self.serial.close()
                     return False
-            # Read incoming data
-            #new_data = self.serial.read(128)
-            #while len(new_data) == 128:
-                #serial_buffer += new_data
-                #new_data = self.serial.read(128)
-                #self.msleep(5)
-            #serial_buffer += new_data
             serial_buffer = self.serial.read(self.command.sample_count / 2)
 
             self.dataReady.emit(serial_buffer)
