@@ -47,7 +47,7 @@ class USARTAnalyzer:
             self._autobaud()
         else:
             self.baud = baud
-            self.bit_size = int(acquisition.sample_rate / self.baud)
+            self.bit_size = float(acquisition.sample_rate) / self.baud
 
     def _autobaud(self):
         """
@@ -63,10 +63,20 @@ class USARTAnalyzer:
         # Find smallest length of continuous values, this is
         rx_bit_s = min([len(list(g)) for k, g in groupby(self.acquisition[0])])
         tx_bit_s = min([len(list(g)) for k, g in groupby(self.acquisition[1])])
-        self.bit_size = min(rx_bit_s, tx_bit_s)
+        bit_size = min(rx_bit_s, tx_bit_s)
+        baud = self.acquisition.sample_rate / bit_size
+        # Check to see if we are close to a standard baud rate
+        bauds = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
+        for b in bauds:
+            if baud < b*1.2 and baud > b*0.8:
+                baud = b
+                break
+        self.baud = baud
+        self.bit_size = float(self.acquisition.sample_rate) / self.baud
 
     def labels(self):
-        pass
+        return [self._read_waveform(n)
+                for n in self.acquisition.acquisition_length]
 
     def _read_waveform(self, waveform_i):
         """
@@ -86,34 +96,46 @@ class USARTAnalyzer:
         """
         labels = []
         start_i = 0
-        while start_i < self.acquisition.acquisition_length:
+        max_i = (self.acquisition.acquisition_length -
+                 int(self.bit_size * self.bit_count))
+        while start_i < max_i:
+            while self.acquisition[waveform_i][start_i] == 0:
+                start_i += 1
+                if start_i >= max_i:
+                    return labels
             while self.acquisition[waveform_i][start_i] == 1:
                 start_i += 1
-                if start_i >= (self.acquisition.acquisition_length -
-                              (self.bit_size * self.bit_count)):
+                if start_i >= max_i:
                     return labels
+            # add 1 bit for start bit
             labels.append((start_i + (self.bit_size * self.bit_count / 2.0),
-                           self._read_byte(start_i)))
+                           self._read_byte(waveform_i,
+                                           start_i + self.bit_size)))
+            start_i += int(self.bit_size * self.bit_count)
         return labels
 
-    def _read_byte(self, waveform_i, start_i):
+    def _read_byte(self, waveform_i, start_pos):
         """
-        Returns the value of the first byte received after start_i.
+        Returns the value of the first byte received after start_pos.
 
         Parameters
         ----------
         waveform_i : int
             The index of the waveform to search in.
-        start_i : int
-            The index to start searching for a byte at. The value at this index
-            should be logic high.
+        start_pos : float
+            The location of the leading edge of the first bit.
         """
         val = 0
         for n in range(self.bit_count):
-            bit_i = start_i + int(n*self.bit_size + (self.bit_size / 2))
+            bit_i = int(start_pos + (n*self.bit_size + (self.bit_size / 2)))
             val += self.acquisition[waveform_i][bit_i] << n
 
-        return val
+        if self.display_mode == 'ascii':
+            return chr(val)
+        elif self.display_mode == 'hex':
+            return hex(val)
+        else:
+            return str(val)
 
 
 class SPIAnalyzer:
