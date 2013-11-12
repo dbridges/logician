@@ -41,6 +41,8 @@ class USARTAnalyzer:
     def __init__(self, acquisition, display_mode, baud=None):
         self.acquisition = acquisition
         self.display_mode = display_mode
+        self.parity = None
+        self.bit_count = 8
         if baud is None:
             self._autobaud()
         else:
@@ -65,6 +67,53 @@ class USARTAnalyzer:
 
     def labels(self):
         pass
+
+    def _read_waveform(self, waveform_i):
+        """
+        Returns the labels for the given waveform.
+
+        Parameters
+        ----------
+        waveform_i : int
+            The index of the wavefrom to encode.
+
+        Returns
+        -------
+        List of tuples
+            Returns a list of tuples in form: [(t0, 'a'), (t1, 'b'), ...],
+            where t0, t1, are the float approximations of indicies of the
+            center of each byte.
+        """
+        labels = []
+        start_i = 0
+        while start_i < self.acquisition.acquisition_length:
+            while self.acquisition[waveform_i][start_i] == 1:
+                start_i += 1
+                if start_i >= (self.acquisition.acquisition_length -
+                              (self.bit_size * self.bit_count)):
+                    return labels
+            labels.append((start_i + (self.bit_size * self.bit_count / 2.0),
+                           self._read_byte(start_i)))
+        return labels
+
+    def _read_byte(self, waveform_i, start_i):
+        """
+        Returns the value of the first byte received after start_i.
+
+        Parameters
+        ----------
+        waveform_i : int
+            The index of the waveform to search in.
+        start_i : int
+            The index to start searching for a byte at. The value at this index
+            should be logic high.
+        """
+        val = 0
+        for n in range(self.bit_count):
+            bit_i = start_i + int(n*self.bit_size + (self.bit_size / 2))
+            val += self.acquisition[waveform_i][bit_i] << n
+
+        return val
 
 
 class SPIAnalyzer:
