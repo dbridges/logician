@@ -1,0 +1,19 @@
+{
+    "name": "Purple",
+    "background": [50, 50, 70, 255],
+
+    "waveform": {
+        "strokeSize": 2,
+        "strokeColor": [[0x3C, 0x9D, 0xD0, 255],
+                        [0xB9, 0x39, 0xD3, 255],
+                        [0xDF, 0xFA, 0, 255],
+                        [0xFF, 0x8B, 0, 255]]
+    },
+
+    "overlay": {
+        "border": [110, 110, 110, 255],
+        "background": [180, 184, 190, 215],
+        "cursor": [255, 255, 255, 255],
+        "text": [255, 255, 255, 255]
+    }
+}
