@@ -160,15 +160,6 @@
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
-        <property name="backgroundBrush">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>50</red>
-           <green>50</green>
-           <blue>70</blue>
-          </color>
-         </brush>
-        </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>

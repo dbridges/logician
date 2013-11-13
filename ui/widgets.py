@@ -1,3 +1,5 @@
+import json
+
 from PySide import QtGui, QtCore, QtOpenGL
 
 import models
@@ -34,8 +36,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.waveformLabels = analyzers.labels('')
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
-        self.setAutoFillBackground(False)
-        self.viewport().setAutoFillBackground(False)
+        self.theme = {'overlay': {}}
+        self.setTheme('default')
         self.redraw()
 
     def setData(self, data):
@@ -51,6 +53,25 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def setWaveformLabels(self, labels):
         self.waveformLabels = labels
         self.update()
+
+    def setTheme(self, theme='default'):
+        try:
+            j = json.loads(open('ui/themes/%s.json' % theme, 'r').read())
+            self.theme = j
+            w = j['waveform']
+        except:
+            self.theme = {}
+            return
+        colors = w.get('strokeColor', [[255, 255, 255, 0]])
+        self.channelPens = []
+        for n in range(4):
+            p = QtGui.QPen()
+            p.setColor(QtGui.QColor(*colors[n % len(colors)]))
+            p.setWidth(w.get('strokeWidth', 2))
+            p.setCosmetic(True)
+            self.channelPens.append(p)
+        self.scene.setBackgroundBrush(QtGui.QBrush(
+            QtGui.QColor(*j.get('background', [0, 0, 0, 255]))))
 
     def drawSignals(self):
         if self.data.acquisition_length == 0:
@@ -81,25 +102,33 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         Paints the hud overlay on top of the widget.
         """
         painter.resetTransform()
-        painter.setPen(QtGui.QPen(QtGui.QColor(228, 228, 228, 255)))
+        o = self.theme['overlay']
+
+        # Draw the width measurement cursor
+        painter.setPen(QtGui.QPen(
+            QtGui.QColor(*o.get('cursor', [255, 255, 255, 255]))))
         self.drawWidthMeasurement(painter)
-        painter.setPen(QtGui.QPen(QtGui.QColor(128, 128, 128, 255)))
 
+        # Draw label background
         ch_height = self.height() / self.data.channel_count
-
-        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0)))
         sidebar_width = 110
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(80, 80, 80, 220)))
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(QtGui.QBrush(
+            QtGui.QColor(*o.get('background', [128, 128, 128, 220]))))
         painter.drawRect(0, 0, sidebar_width, self.height())
-        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 255)))
-        painter.drawLine(sidebar_width, 0, sidebar_width, self.height())
 
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 255)))
+        # Draw waveform text labels.
+        painter.setPen(QtGui.QPen(
+            QtGui.QColor(*o.get('text', [0, 0, 0, 255]))))
         for n in range(self.data.channel_count):
             painter.drawText(0, ch_height*n, sidebar_width, ch_height,
                              QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter,
                              self.waveformLabels[n])
 
+        painter.setPen(QtGui.QPen(
+            QtGui.QColor(*o.get('border', [0, 0, 0, 255]))))
+        painter.drawLine(sidebar_width, 0, sidebar_width, self.height())
+        # Draw borders between waveforms.
         for n in range(self.data.channel_count):
             painter.drawLine(0, n*ch_height, self.width(), n*ch_height)
 

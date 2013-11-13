@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Sat Nov  9 14:22:03 2013
+# Created: Tue Nov 12 20:57:34 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,9 +77,6 @@ class Ui_MainWindow(object):
         self.analyzerWidget.setFrameShadow(QtGui.QFrame.Plain)
         self.analyzerWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.analyzerWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        brush = QtGui.QBrush(QtGui.QColor(50, 50, 70))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        self.analyzerWidget.setBackgroundBrush(brush)
         self.analyzerWidget.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.analyzerWidget.setRenderHints(QtGui.QPainter.TextAntialiasing)
         self.analyzerWidget.setObjectName("analyzerWidget")
