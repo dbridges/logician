@@ -36,7 +36,7 @@ class USARTAnalyzer:
         If None autobaud is attempted, otherwise the baudrate of the
         acquisition.
     """
-    channel_names = ['RX', 'TX', 'Channel 2', 'Channel 3']
+    channel_names = ['RX', 'TX', 'Ch 2', 'Ch 3']
 
     def __init__(self, acquisition, display_mode, baud=None):
         self.acquisition = acquisition
@@ -169,7 +169,7 @@ class I2CAnalyzer:
         Should be one of 'ascii', 'hex', 'decimal'. The format to display the
         labels
     """
-    channel_names = ['SCL', 'SDA', 'Channel 2', 'Channel 3']
+    channel_names = ['SCL', 'SDA', 'Ch 2', 'Ch 3']
 
     def __init__(self, acquisition, display_mode):
         self.acquisition = acquisition

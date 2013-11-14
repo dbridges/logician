@@ -108,7 +108,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
 
         # Draw label background
         ch_height = self.height() / self.data.channel_count
-        sidebar_width = 110
+        sidebar_width = 50
         painter.setPen(QtCore.Qt.NoPen)
         painter.setBrush(QtGui.QBrush(
             QtGui.QColor(*o.get('background', [128, 128, 128, 220]))))
