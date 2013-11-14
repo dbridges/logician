@@ -17,24 +17,11 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.setScene(self.scene)
         self.data = models.Acquisition([[], [], [], []])
 
-        colors = [QtGui.QColor(0x3C, 0x9D, 0xD0, 255),
-                  QtGui.QColor(0xB9, 0x39, 0xD3, 255),
-                  QtGui.QColor(0xDF, 0xFA, 0x00, 255),
-                  QtGui.QColor(0xFF, 0x8B, 0x00, 255)]
-        self.channelPens = []
-        for n in range(4):
-            p = QtGui.QPen()
-            p.setColor(colors[n])
-            p.setWidth(2)
-            p.setCosmetic(True)
-            self.channelPens.append(p)
-
         self._subviewMargin = 24
         self._pulseWidthCoords = None
         self.waveformLabels = analyzers.labels('')
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
-        self.theme = {'overlay': {}}
         self.setTheme({})
         self.redraw()
 

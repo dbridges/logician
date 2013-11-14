@@ -18,7 +18,7 @@ def labels(protocol):
     elif protocol.lower() == 'i2c':
         return I2CAnalyzer.channel_names
     else:
-        return ['Channel 0', 'Channel 1', 'Channel 2', 'Channel 3']
+        return ['Ch 0', 'Ch 1', 'Ch 2', 'Ch 3']
 
 
 class USARTAnalyzer:
