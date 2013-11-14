@@ -1,5 +1,3 @@
-import json
-
 from PySide import QtGui, QtCore, QtOpenGL
 
 import models
@@ -37,7 +35,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.grabGesture(QtCore.Qt.PinchGesture)
         self.setViewport(QtOpenGL.QGLWidget())
         self.theme = {'overlay': {}}
-        self.setTheme('default')
+        self.setTheme({})
         self.redraw()
 
     def setData(self, data):
@@ -54,13 +52,11 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.waveformLabels = labels
         self.update()
 
-    def setTheme(self, theme='default'):
+    def setTheme(self, theme={}):
+        self.theme = theme
         try:
-            j = json.loads(open('ui/themes/%s.json' % theme, 'r').read())
-            self.theme = j
-            w = j['waveform']
+            w = self.theme['waveform']
         except:
-            self.theme = {}
             return
         colors = w.get('strokeColor', [[255, 255, 255, 0]])
         self.channelPens = []
@@ -71,7 +67,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             p.setCosmetic(True)
             self.channelPens.append(p)
         self.scene.setBackgroundBrush(QtGui.QBrush(
-            QtGui.QColor(*j.get('background', [0, 0, 0, 255]))))
+            QtGui.QColor(*self.theme.get('background', [0, 0, 0, 255]))))
+        self.redraw()
 
     def drawSignals(self):
         if self.data.acquisition_length == 0:

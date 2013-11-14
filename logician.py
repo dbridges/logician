@@ -8,7 +8,7 @@ import serial
 from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
-from models import Acquisition, AnalyzerCommand
+from models import Acquisition, AnalyzerCommand, ThemeManager
 import analyzers
 
 from ui.main_window import Ui_MainWindow
@@ -149,6 +149,18 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                            self.protocolComboBox,
                            'displayTypeIndex':
                            self.displayTypeComboBox}
+
+        # load themes
+        self.themeManager = ThemeManager('ui/themes/')
+        for name in self.themeManager.theme_names():
+            action = self.menuTheme.addAction(name)
+            action.setCheckable(True)
+
+        self.analyzerWidget.setTheme(self.themeManager.theme_named('Dark'))
+        for action in self.menuTheme.actions():
+            if action.text() == 'Dark':
+                action.setChecked(True)
+                break
         self.show()
         self.loadSettings()
 
@@ -206,6 +218,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def on_protocolComboBox_currentIndexChanged(self):
         self.analyzerWidget.setWaveformLabels(
             analyzers.labels(self.protocolComboBox.currentText()))
+
+    @QtCore.Slot(QtGui.QAction)
+    def on_menuTheme_triggered(self, action):
+        self.analyzerWidget.setTheme(
+            self.themeManager.theme_named(action.text()))
+        for a in self.menuTheme.actions():
+            if a != action:
+                a.setChecked(False)
 
     def on_acquireThread_data(self, data_bytes):
         self.analyzerWidget.setData(

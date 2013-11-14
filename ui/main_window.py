@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Wed Nov 13 06:34:48 2013
+# Created: Wed Nov 13 21:22:29 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -106,6 +106,10 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        self.menuView = QtGui.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
+        self.menuTheme = QtGui.QMenu(self.menuView)
+        self.menuTheme.setObjectName("menuTheme")
         MainWindow.setMenuBar(self.menubar)
         self.statusBar = QtGui.QStatusBar(MainWindow)
         font = QtGui.QFont()
@@ -121,9 +125,13 @@ class Ui_MainWindow(object):
         self.actionSave_to_Spreadsheet.setObjectName("actionSave_to_Spreadsheet")
         self.actionOpen = QtGui.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
+        self.actionDefault = QtGui.QAction(MainWindow)
+        self.actionDefault.setObjectName("actionDefault")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave_to_Spreadsheet)
+        self.menuView.addAction(self.menuTheme.menuAction())
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -149,10 +157,13 @@ class Ui_MainWindow(object):
         self.displayTypeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Hex", None, QtGui.QApplication.UnicodeUTF8))
         self.displayTypeComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Decimal", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuTheme.setTitle(QtGui.QApplication.translate("MainWindow", "Theme", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSave_to_Spreadsheet.setText(QtGui.QApplication.translate("MainWindow", "Save to Spreadsheet...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSave_to_Spreadsheet.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+S", None, QtGui.QApplication.UnicodeUTF8))
         self.actionOpen.setText(QtGui.QApplication.translate("MainWindow", "Open...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionOpen.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+O", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionDefault.setText(QtGui.QApplication.translate("MainWindow", "Default", None, QtGui.QApplication.UnicodeUTF8))
 
 from ui.widgets import AnalyzerWidget

@@ -2,6 +2,8 @@
 This file contains the general data storage classes used throughout Logician.
 """
 import csv
+import json
+import os
 from collections import OrderedDict
 
 VALID_CHANNEL_COUNTS = [4]
@@ -118,3 +120,47 @@ class AnalyzerCommand:
              trigger_type, trigger_channel]
         self.command_bytes = (''.join([chr(x) for x in self.command_bytes]) +
                               ' '*(64 - len(self.command_bytes)))
+
+
+class ThemeManager:
+    """
+    A class to manage and load themes for the signal display.
+    """
+    def __init__(self, theme_dir):
+        self.theme_dir = theme_dir
+        self.refresh()
+
+    def refresh(self):
+        self.themes = []
+        for fname in os.listdir(self.theme_dir):
+            if fname.endswith('.json'):
+                try:
+                    j = json.loads(
+                        open(os.path.join(self.theme_dir, fname)).read())
+                    self.themes.append(j)
+                except:
+                    continue
+
+    def theme_names(self):
+        """
+        Returns the names for each theme.
+        """
+        return [theme.get('name', 'Error') for theme in self.themes]
+
+    def theme_named(self, name):
+        """
+        Returns the theme named name.
+
+        Paramters
+        ---------
+        name : str
+            The name of the theme to return.
+
+        Returns
+        -------
+        Returns the theme as a dict, or an empty dict if theme could not be
+        found.
+        """
+        for theme in self.themes:
+            if theme.get('name', 'Error') == name:
+                return theme

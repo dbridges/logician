@@ -1,5 +1,5 @@
 {
-    "name": "Default",
+    "name": "Dark",
     "background": [48, 52, 60, 255],
 
     "waveform": {
@@ -12,8 +12,8 @@
 
     "overlay": {
         "border": [110, 110, 110, 255],
-        "background": [180, 184, 190, 215],
+        "background": [60, 60, 60, 215],
         "cursor": [255, 255, 255, 255],
-        "text": [0, 80, 230, 255]
+        "text": [240, 240, 240, 255]
     }
 }
