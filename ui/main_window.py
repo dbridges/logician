@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Thu Nov 14 06:18:58 2013
+# Created: Thu Nov 14 21:19:13 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -94,12 +94,12 @@ class Ui_MainWindow(object):
         self.protocolComboBox.addItem("")
         self.protocolComboBox.addItem("")
         self.verticalLayout.addWidget(self.protocolComboBox)
-        self.displayTypeComboBox = QtGui.QComboBox(self.centralwidget)
-        self.displayTypeComboBox.setObjectName("displayTypeComboBox")
-        self.displayTypeComboBox.addItem("")
-        self.displayTypeComboBox.addItem("")
-        self.displayTypeComboBox.addItem("")
-        self.verticalLayout.addWidget(self.displayTypeComboBox)
+        self.displayModeComboBox = QtGui.QComboBox(self.centralwidget)
+        self.displayModeComboBox.setObjectName("displayModeComboBox")
+        self.displayModeComboBox.addItem("")
+        self.displayModeComboBox.addItem("")
+        self.displayModeComboBox.addItem("")
+        self.verticalLayout.addWidget(self.displayModeComboBox)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 911, 22))
@@ -153,9 +153,9 @@ class Ui_MainWindow(object):
         self.protocolComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "I2C", None, QtGui.QApplication.UnicodeUTF8))
         self.protocolComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "SPI", None, QtGui.QApplication.UnicodeUTF8))
         self.protocolComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "USART", None, QtGui.QApplication.UnicodeUTF8))
-        self.displayTypeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Ascii", None, QtGui.QApplication.UnicodeUTF8))
-        self.displayTypeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Hex", None, QtGui.QApplication.UnicodeUTF8))
-        self.displayTypeComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Decimal", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayModeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Ascii", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayModeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Hex", None, QtGui.QApplication.UnicodeUTF8))
+        self.displayModeComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Decimal", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.menuTheme.setTitle(QtGui.QApplication.translate("MainWindow", "Theme", None, QtGui.QApplication.UnicodeUTF8))

@@ -204,7 +204,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QComboBox" name="displayTypeComboBox">
+     <widget class="QComboBox" name="displayModeComboBox">
       <item>
        <property name="text">
         <string>Ascii</string>

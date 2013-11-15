@@ -1,6 +1,7 @@
 """
 An Analyzer class should take an Acquisition object and return a list of labels
-and their resepective locations: [(10, 'A'), (8, 'B'), ...].
+and their resepective locations and widths: [(10, 80, 'A'), (8, 80, 'B'), ...].
+where 10 is the left edge, 80 is the width of the label, and 'A' is the text.
 
 All analyzer class should take these values in their constructors:
     display_mode        ascii, hex, decimal
@@ -76,7 +77,7 @@ class USARTAnalyzer:
 
     def labels(self):
         return [self._read_waveform(n)
-                for n in self.acquisition.acquisition_length]
+                for n in range(len(self.acquisition))]
 
     def _read_waveform(self, waveform_i):
         """
@@ -108,7 +109,8 @@ class USARTAnalyzer:
                 if start_i >= max_i:
                     return labels
             # add 1 bit for start bit
-            labels.append((start_i + (self.bit_size * self.bit_count / 2.0),
+            labels.append((start_i + self.bit_size,
+                           self.bit_size * self.bit_count,
                            self._read_byte(waveform_i,
                                            start_i + self.bit_size)))
             start_i += int(self.bit_size * self.bit_count)

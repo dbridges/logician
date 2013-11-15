@@ -16,6 +16,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
         self.data = models.Acquisition([[], [], [], []])
+        self.byteLabels = []
 
         self._subviewMargin = 24
         self._pulseWidthCoords = None
@@ -25,7 +26,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.setTheme({})
         self.redraw()
 
-    def setData(self, data):
+    def setData(self, data, redraw=False):
         """
         Parameters
         ----------
@@ -33,7 +34,23 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             An acquisition object holding the channel data.
         """
         self.data = data
-        self.redraw()
+        if redraw:
+            self.redraw()
+
+    def setByteLabels(self, labels, redraw=False):
+        """
+        Sets the byte labels.
+
+        Parameters
+        ----------
+        labels : List of List of tuple
+            There should be 4 lists, with each list containing a list of tuples
+            for a single waveform. The tuple format is (x, width, text). Where
+            x is the left most edge of the label.
+        """
+        self.byteLabels = labels
+        if redraw:
+            self.redraw()
 
     def setWaveformLabels(self, labels):
         self.waveformLabels = labels
@@ -60,18 +77,32 @@ class AnalyzerWidget(QtGui.QGraphicsView):
     def drawSignals(self):
         if self.data.acquisition_length == 0:
             return
-        subviewHeight = self.height() / 4 - self._subviewMargin / 2
+        subviewHeight = (self.height() / len(self.data) -
+                         self._subviewMargin / 2)
         for i, data in enumerate(self.data):
             item = AnalyzerChannelGraphicsItem(data, subviewHeight,
                                                self.channelPens[i])
             item.setY(i*subviewHeight + i*self._subviewMargin / 2)
             self.scene.addItem(item)
 
+    def drawByteLabels(self):
+        if len(self.byteLabels) <= 0:
+            return
+        subviewHeight = (self.height() / len(self.data) -
+                         self._subviewMargin / 2)
+        for y, waveform_labels in enumerate(self.byteLabels):
+            for x, width, text in waveform_labels:
+                self.scene.addItem(
+                    ByteLabelGraphicsItem(x, y*subviewHeight + 2,
+                                          width, self._subviewMargin - 4,
+                                          text, self.theme))
+
     def redraw(self):
         x_scale = self.transform().m11()
         self.resetTransform()
         self.scene.clear()
         self.drawSignals()
+        self.drawByteLabels()
         self.setScale(x_scale, 1)
         self.scene.setSceneRect(0, 0, self.data.acquisition_length,
                                 self.height() - self._subviewMargin/2)
@@ -264,6 +295,12 @@ class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
         self._height = 10
         self.pen = pen
 
+    def boundingRect(self):
+        return QtCore.QRectF(self._coords[0],
+                             self._coords[1] - self._height/2,
+                             self._coords[2] - self._coords[0],
+                             self._height)
+
     def paint(self, painter, option, widget):
         painter.setPen(self.pen)
         painter.drawLine(*self._coords)
@@ -276,8 +313,31 @@ class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
                          self._coords[2],
                          self._coords[1] + self._height / 2)
 
+
+class ByteLabelGraphicsItem(QtGui.QGraphicsTextItem):
+    """
+    Draws a byte label centered at the given point.
+    """
+    def __init__(self, x, y, width, height, text, theme):
+        super(ByteLabelGraphicsItem, self).__init__()
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.theme = theme
+        self.text = text
+        self.setPlainText(text)
+
     def boundingRect(self):
-        return QtCore.QRectF(self._coords[0],
-                             self._coords[1] - self._height/2,
-                             self._coords[2] - self._coords[0],
-                             self._height)
+        return QtCore.QRectF(self.x, self.y, self.width, self.height)
+
+    def paint(self, painter, option, widget):
+        painter.setPen(
+            QtGui.QPen(QtGui.QColor(*self.theme['labels']['text'])))
+        painter.setBrush(
+            QtGui.QBrush(QtGui.QColor(*self.theme['labels']['background'])))
+        painter.drawRect(self.x, self.y, self.width, self.height)
+        #super(ByteLabelGraphicsItem, self).paint(painter, option, widget)
+        painter.drawText(self.x, self.y, self.width, self.height,
+                         QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter,
+                         self.text)

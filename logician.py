@@ -134,7 +134,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             self.sampleRateComboBox.addItem(key)
         self.toolBar.addWidget(self.topRowLayoutWidget)
         self.statusBar.addPermanentWidget(self.protocolComboBox)
-        self.statusBar.addPermanentWidget(self.displayTypeComboBox)
+        self.statusBar.addPermanentWidget(self.displayModeComboBox)
         self.analyzerWidget.showMessage.connect(
             self.statusBar.showMessage, QtCore.Qt.QueuedConnection)
         self.comboBoxes = {'sampleRateIndex':
@@ -147,8 +147,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                            self.triggerSlopeComboBox,
                            'protocolIndex':
                            self.protocolComboBox,
-                           'displayTypeIndex':
-                           self.displayTypeComboBox}
+                           'displayModeIndex':
+                           self.displayModeComboBox}
 
         # load themes
         self.themeManager = ThemeManager('ui/themes/')
@@ -196,7 +196,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg.exec_()
 
             return
-        self.analyzerWidget.setData(data)
+        self.setData(data)
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     @QtCore.Slot()
@@ -228,12 +228,26 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                 a.setChecked(False)
 
     def on_acquireThread_data(self, data_bytes):
-        self.analyzerWidget.setData(
+        self.setData(
             Acquisition(data_bytes, sample_rate=1e6, channel_count=4))
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     def on_acquireThread_finished(self):
         self.startButton.setEnabled(True)
+
+    def setData(self, data):
+        self.analyzerWidget.setData(data)
+        analyzer = None
+        if self.protocolComboBox.currentText() == 'USART':
+            analyzer = analyzers.USARTAnalyzer(
+                data, self.displayModeComboBox.currentText().lower())
+        elif self.protocolComboBox.currentText() == 'I2C':
+            analyzer = analyzers.I2CAnalyzer(
+                data, self.displayModeComboBox.currentText().lower())
+        elif self.protocolComboBox.currentText() == 'SPI':
+            analyzer = analyzers.SPIAnalyzer(
+                data, self.displayTypeComboBox.currentText().lower())
+        self.analyzerWidget.setByteLabels(analyzer.labels(), redraw=True)
 
     def loadSettings(self):
         try:
