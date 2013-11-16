@@ -195,7 +195,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         """
         if self.data.acquisition_length != 0:
             min_scale = float(self.width()) / self.data.acquisition_length
-            max_scale = float(self.width()) / 20
+            max_scale = float(self.width()) / 80
         else:
             max_scale = 2
             min_scale = 1
@@ -314,7 +314,7 @@ class HorizontalArrowGraphicsItem(QtGui.QGraphicsItem):
                          self._coords[1] + self._height / 2)
 
 
-class ByteLabelGraphicsItem(QtGui.QGraphicsTextItem):
+class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
     """
     Draws a byte label centered at the given point.
     """
@@ -326,7 +326,6 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsTextItem):
         self.height = height
         self.theme = theme
         self.text = text
-        self.setPlainText(text)
 
     def boundingRect(self):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
@@ -337,7 +336,12 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsTextItem):
         painter.setBrush(
             QtGui.QBrush(QtGui.QColor(*self.theme['labels']['background'])))
         painter.drawRect(self.x, self.y, self.width, self.height)
-        #super(ByteLabelGraphicsItem, self).paint(painter, option, widget)
-        painter.drawText(self.x, self.y, self.width, self.height,
+        transform = painter.transform()
+        painter.resetTransform()
+        painter.translate(transform.m31(), transform.m32())
+        painter.drawText(self.x * transform.m11(),
+                         self.y * transform.m22(),
+                         self.width * transform.m11(),
+                         self.height * transform.m22(),
                          QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter,
                          self.text)

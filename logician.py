@@ -219,6 +219,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.analyzerWidget.setWaveformLabels(
             analyzers.labels(self.protocolComboBox.currentText()))
 
+    @QtCore.Slot()
+    def on_displayModeComboBox_currentIndexChanged(self):
+        self.reloadByteLabels()
+
     @QtCore.Slot(QtGui.QAction)
     def on_menuTheme_triggered(self, action):
         self.analyzerWidget.setTheme(
@@ -237,6 +241,10 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     def setData(self, data):
         self.analyzerWidget.setData(data)
+        self.reloadByteLabels()
+
+    def reloadByteLabels(self):
+        data = self.analyzerWidget.data
         analyzer = None
         if self.protocolComboBox.currentText() == 'USART':
             analyzer = analyzers.USARTAnalyzer(
