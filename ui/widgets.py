@@ -16,6 +16,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene(self)
         self.setScene(self.scene)
         self.data = models.Acquisition([[], [], [], []])
+        self.byteLabelItems = []
         self.byteLabels = []
 
         self._subviewMargin = 24
@@ -53,6 +54,10 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         if redraw:
             self.redraw()
 
+    def setByteLabelItemsVisible(self, visible=True):
+        for label in self.byteLabelItems:
+            label.setVisible(visible)
+
     def setWaveformLabels(self, labels):
         self.waveformLabels = labels
         self.update()
@@ -87,16 +92,16 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             self.scene.addItem(item)
 
     def drawByteLabels(self):
-        if len(self.byteLabels) <= 0:
-            return
+        self.byteLabelItems = []
         subviewHeight = (self.height() / len(self.data) -
                          self._subviewMargin / 2)
         for y, waveform_labels in enumerate(self.byteLabels):
             for x, width, text in waveform_labels:
-                self.scene.addItem(
-                    ByteLabelGraphicsItem(x, y*subviewHeight + 2,
-                                          width, self._subviewMargin - 4,
-                                          text, self.theme))
+                new_item = ByteLabelGraphicsItem(
+                    x, y*subviewHeight + 2, width, self._subviewMargin - 4,
+                    text, self.theme)
+                self.byteLabelItems.append(new_item)
+                self.scene.addItem(new_item)
 
     def redraw(self):
         x_scale = self.transform().m11()
@@ -206,6 +211,14 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             x_scale = min_scale
         self.resetTransform()
         super(AnalyzerWidget, self).scale(x_scale, y_scale)
+        try:
+            if (self.byteLabelItems[0].boundingRect().width() *
+                    self.transform().m11()) < 30:
+                self.setByteLabelItemsVisible(False)
+            else:
+                self.setByteLabelItemsVisible(True)
+        except:
+            pass
 
     def mouseMoveEvent(self, event):
         if self.data.acquisition_length < 1:
