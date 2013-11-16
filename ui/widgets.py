@@ -336,8 +336,6 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
             QtGui.QPen(QtGui.QColor(*self.theme['labels']['border'])))
         painter.setBrush(
             QtGui.QBrush(QtGui.QColor(*self.theme['labels']['background'])))
-        #painter.drawRect(self.x, self.y, self.width, self.height)
-        #painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing)
         transform = painter.transform()
         x = self.x * transform.m11()
         y = self.y * transform.m22()
