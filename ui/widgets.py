@@ -22,7 +22,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self._pulseWidthCoords = None
         self.waveformLabels = analyzers.labels('')
         self.grabGesture(QtCore.Qt.PinchGesture)
-        self.setViewport(QtOpenGL.QGLWidget())
+        self.setViewport(QtOpenGL.QGLWidget(
+            QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers)))
         self.setTheme({})
         self.redraw()
 
@@ -332,16 +333,21 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         painter.setPen(
-            QtGui.QPen(QtGui.QColor(*self.theme['labels']['text'])))
+            QtGui.QPen(QtGui.QColor(*self.theme['labels']['border'])))
         painter.setBrush(
             QtGui.QBrush(QtGui.QColor(*self.theme['labels']['background'])))
-        painter.drawRect(self.x, self.y, self.width, self.height)
+        #painter.drawRect(self.x, self.y, self.width, self.height)
+        #painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing)
         transform = painter.transform()
+        x = self.x * transform.m11()
+        y = self.y * transform.m22()
+        width = self.width * transform.m11()
+        height = self.height * transform.m22()
         painter.resetTransform()
         painter.translate(transform.m31(), transform.m32())
-        painter.drawText(self.x * transform.m11(),
-                         self.y * transform.m22(),
-                         self.width * transform.m11(),
-                         self.height * transform.m22(),
+        painter.drawRoundedRect(x, y, width, height, height / 2, height / 2)
+        painter.setPen(
+            QtGui.QPen(QtGui.QColor(*self.theme['labels']['text'])))
+        painter.drawText(x, y, width, height,
                          QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter,
                          self.text)
