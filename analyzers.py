@@ -3,9 +3,6 @@ An Analyzer class should take an Acquisition object and return a list of labels
 and their resepective locations and widths: [(10, 80, 'A'), (8, 80, 'B'), ...].
 where 10 is the left edge, 80 is the width of the label, and 'A' is the text.
 
-All analyzer class should take these values in their constructors:
-    display_mode        ascii, hex, decimal
-
 """
 
 from itertools import groupby
@@ -22,6 +19,29 @@ def labels(protocol):
         return ['Ch 0', 'Ch 1', 'Ch 2', 'Ch 3']
 
 
+def format_byte(value, format_type='ascii'):
+    """
+    Returns a string for displaying a byte value in the requested format.
+
+    Parameters
+    ----------
+    value : int
+        The value to format, should be 0 - 255
+
+    format_type : str
+        The display format, one of 'ascii', 'hex', 'decimal'.
+    """
+    format_type = format_type.lower()
+    if format_type == 'ascii':
+        return chr(value)
+    elif format_type == 'hex':
+        return hex(value)
+    elif format_type == 'decimal':
+        return str(value)
+    else:
+        raise ValueError("format_type must be 'ascii', 'hex', or 'decimal'")
+
+
 class USARTAnalyzer:
     """
     USART acquisition analyzer.
@@ -30,18 +50,14 @@ class USARTAnalyzer:
     ----------
     acquisition : Acquisition
         The Acquisition object to analyze.
-    display_mode : str
-        Should be one of 'ascii', 'hex', 'decimal'. The format to display the
-        labels
     baud : int
         If None autobaud is attempted, otherwise the baudrate of the
         acquisition.
     """
     channel_names = ['RX', 'TX', 'Ch 2', 'Ch 3']
 
-    def __init__(self, acquisition, display_mode, baud=None):
+    def __init__(self, acquisition, baud=None):
         self.acquisition = acquisition
-        self.display_mode = display_mode
         self.parity = None
         self.bit_count = 8
         if baud is None:
@@ -131,13 +147,7 @@ class USARTAnalyzer:
         for n in range(self.bit_count):
             bit_i = int(start_pos + (n*self.bit_size + (self.bit_size / 2)))
             val += self.acquisition[waveform_i][bit_i] << n
-
-        if self.display_mode == 'ascii':
-            return chr(val)
-        elif self.display_mode == 'hex':
-            return hex(val)
-        else:
-            return str(val)
+        return val
 
 
 class SPIAnalyzer:
@@ -148,15 +158,14 @@ class SPIAnalyzer:
     ----------
     acquisition : Acquisition
         The Acquisition object to analyze.
-    display_mode : str
-        Should be one of 'ascii', 'hex', 'decimal'. The format to display the
-        labels
     """
     channel_names = ['CLK', 'MOSI', 'MISO', 'CS']
 
-    def __init__(self, acquisition, display_mode):
+    def __init__(self, acquisition):
         self.acquisition = acquisition
-        self.display_mode = display_mode
+
+    def labels(self):
+        return []
 
 
 class I2CAnalyzer:
@@ -167,12 +176,11 @@ class I2CAnalyzer:
     ----------
     acquisition : Acquisition
         The Acquisition object to analyze.
-    display_mode : str
-        Should be one of 'ascii', 'hex', 'decimal'. The format to display the
-        labels
     """
     channel_names = ['SCL', 'SDA', 'Ch 2', 'Ch 3']
 
-    def __init__(self, acquisition, display_mode):
+    def __init__(self, acquisition):
         self.acquisition = acquisition
-        self.display_mode = display_mode
+
+    def labels(self):
+        return []

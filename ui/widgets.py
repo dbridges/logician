@@ -18,7 +18,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         self.data = models.Acquisition([[], [], [], []])
         self.byteLabelItems = []
         self.byteLabels = []
-
+        self.byteFormat = 'ascii'
+        self.setResizeAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
         self._subviewMargin = 24
         self._pulseWidthCoords = None
         self.waveformLabels = analyzers.labels('')
@@ -36,8 +37,22 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             An acquisition object holding the channel data.
         """
         self.data = data
+        self.byteLabels = []
+        self.byteLabelItems = []
         if redraw:
             self.redraw()
+
+    def setByteFormat(self, format_type):
+        """
+        Sets the byte display format.
+
+        Parameters
+        ----------
+        format_type : str
+            The display format, one of 'ascii', 'hex', 'decimal'.
+        """
+        self.byteFormat = format_type
+        self.redraw()
 
     def setByteLabels(self, labels, redraw=False):
         """
@@ -96,7 +111,8 @@ class AnalyzerWidget(QtGui.QGraphicsView):
         subviewHeight = (self.height() / len(self.data) -
                          self._subviewMargin / 2)
         for y, waveform_labels in enumerate(self.byteLabels):
-            for x, width, text in waveform_labels:
+            for x, width, value in waveform_labels:
+                text = analyzers.format_byte(value, self.byteFormat)
                 new_item = ByteLabelGraphicsItem(
                     x, y*subviewHeight + 2, width, self._subviewMargin - 4,
                     text, self.theme)
@@ -181,6 +197,7 @@ class AnalyzerWidget(QtGui.QGraphicsView):
             x_scale = self.transform().m11()
             new_scale = x_scale * gesture.scaleFactor()
             self.setScale(new_scale, 1)
+            event.accept()
         return True
 
     def setScale(self, x_scale, y_scale=1):
@@ -346,9 +363,11 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         painter.setPen(
-            QtGui.QPen(QtGui.QColor(*self.theme['labels']['border'])))
+            QtGui.QPen(QtGui.QColor(
+                *self.theme['labels'].get('border', [255, 255, 255, 255]))))
         painter.setBrush(
-            QtGui.QBrush(QtGui.QColor(*self.theme['labels']['background'])))
+            QtGui.QBrush(QtGui.QColor(
+                *self.theme['labels'].get('background', [0, 0, 0, 255]))))
         transform = painter.transform()
         x = self.x * transform.m11()
         y = self.y * transform.m22()
@@ -358,7 +377,8 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
         painter.translate(transform.m31(), transform.m32())
         painter.drawRoundedRect(x, y, width, height, height / 2, height / 2)
         painter.setPen(
-            QtGui.QPen(QtGui.QColor(*self.theme['labels']['text'])))
+            QtGui.QPen(QtGui.QColor(
+                *self.theme['labels'].get('text', [255, 255, 255, 255]))))
         painter.drawText(x, y, width, height,
                          QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter,
                          self.text)

@@ -218,10 +218,12 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def on_protocolComboBox_currentIndexChanged(self):
         self.analyzerWidget.setWaveformLabels(
             analyzers.labels(self.protocolComboBox.currentText()))
+        self.reloadByteLabels()
 
     @QtCore.Slot()
     def on_displayModeComboBox_currentIndexChanged(self):
-        self.reloadByteLabels()
+        self.analyzerWidget.setByteFormat(
+            self.displayModeComboBox.currentText())
 
     @QtCore.Slot(QtGui.QAction)
     def on_menuTheme_triggered(self, action):
@@ -247,15 +249,13 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         data = self.analyzerWidget.data
         analyzer = None
         if self.protocolComboBox.currentText() == 'USART':
-            analyzer = analyzers.USARTAnalyzer(
-                data, self.displayModeComboBox.currentText().lower())
+            analyzer = analyzers.USARTAnalyzer(data)
         elif self.protocolComboBox.currentText() == 'I2C':
-            analyzer = analyzers.I2CAnalyzer(
-                data, self.displayModeComboBox.currentText().lower())
+            analyzer = analyzers.I2CAnalyzer(data)
         elif self.protocolComboBox.currentText() == 'SPI':
-            analyzer = analyzers.SPIAnalyzer(
-                data, self.displayTypeComboBox.currentText().lower())
-        self.analyzerWidget.setByteLabels(analyzer.labels(), redraw=True)
+            analyzer = analyzers.SPIAnalyzer(data)
+        if analyzer is not None:
+            self.analyzerWidget.setByteLabels(analyzer.labels(), redraw=True)
 
     def loadSettings(self):
         try:
