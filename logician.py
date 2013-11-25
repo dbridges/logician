@@ -8,9 +8,9 @@ import serial
 from serial.tools import list_ports
 from PySide import QtGui, QtCore
 
-from models import Acquisition, AnalyzerCommand, ThemeManager
 import analyzers
-
+import ui
+from models import Acquisition, AnalyzerCommand, ThemeManager
 from ui.main_window import Ui_MainWindow
 
 
@@ -215,10 +215,15 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg.exec_()
 
     @QtCore.Slot()
-    def on_protocolComboBox_currentIndexChanged(self):
-        self.analyzerWidget.setWaveformLabels(
-            analyzers.labels(self.protocolComboBox.currentText()))
-        self.reloadByteLabels()
+    def on_protocolComboBox_activated(self):
+        #self.analyzerWidget.setWaveformLabels(
+            #analyzers.labels(self.protocolComboBox.currentText()))
+        if self.protocolComboBox.currentIndex() != 0:
+            dialog = ui.widgets.AnalyzerDialog(self)
+            dialog.analyzerTypeComboBox.setCurrentIndex(
+                self.protocolComboBox.currentIndex() - 1)
+            dialog.exec_()
+            self.reloadByteLabels()
 
     @QtCore.Slot()
     def on_displayModeComboBox_currentIndexChanged(self):

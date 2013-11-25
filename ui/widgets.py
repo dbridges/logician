@@ -3,6 +3,8 @@ from PySide import QtGui, QtCore, QtOpenGL
 import models
 import analyzers
 
+from ui.analyzer_dialog import Ui_AnalyzerDialog
+
 
 class AnalyzerWidget(QtGui.QGraphicsView):
     """
@@ -382,3 +384,17 @@ class ByteLabelGraphicsItem(QtGui.QGraphicsItem):
         painter.drawText(x, y, width, height,
                          QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter,
                          self.text)
+
+
+class AnalyzerDialog(QtGui.QDialog, Ui_AnalyzerDialog):
+    """
+    Dialog box to display options for analyzers.
+    """
+    def __init__(self, parent=None):
+        super(AnalyzerDialog, self).__init__(parent)
+        self.setupUi(self)
+
+    @QtCore.Slot()
+    def on_analyzerTypeComboBox_currentIndexChanged(self):
+        self.stackedWidget.setCurrentIndex(
+            self.analyzerTypeComboBox.currentIndex())

@@ -188,17 +188,17 @@
       </item>
       <item>
        <property name="text">
-        <string>I2C</string>
+        <string>I2C...</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>SPI</string>
+        <string>SPI...</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>USART</string>
+        <string>USART...</string>
        </property>
       </item>
      </widget>

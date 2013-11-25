@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/MainWindow.ui'
 #
-# Created: Sun Nov 17 07:28:36 2013
+# Created: Sat Nov 23 19:20:16 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -150,9 +150,9 @@ class Ui_MainWindow(object):
         self.startButton.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.protocolComboBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Select a suitable communication protocol.", None, QtGui.QApplication.UnicodeUTF8))
         self.protocolComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "General I/O", None, QtGui.QApplication.UnicodeUTF8))
-        self.protocolComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "I2C", None, QtGui.QApplication.UnicodeUTF8))
-        self.protocolComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "SPI", None, QtGui.QApplication.UnicodeUTF8))
-        self.protocolComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "USART", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "I2C...", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "SPI...", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "USART...", None, QtGui.QApplication.UnicodeUTF8))
         self.displayModeComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Ascii", None, QtGui.QApplication.UnicodeUTF8))
         self.displayModeComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "Hex", None, QtGui.QApplication.UnicodeUTF8))
         self.displayModeComboBox.setItemText(2, QtGui.QApplication.translate("MainWindow", "Decimal", None, QtGui.QApplication.UnicodeUTF8))
