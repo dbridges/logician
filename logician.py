@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -157,6 +157,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             action.setCheckable(True)
 
         self.analyzerWidget.setTheme(self.themeManager.theme_named('Dark'))
+        print('hey')
         for action in self.menuTheme.actions():
             if action.text() == 'Dark':
                 action.setChecked(True)
@@ -196,7 +197,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             msg.exec_()
 
             return
-        self.setData(data)
+        self.setData(data, redraw=True)
         self.actionSave_to_Spreadsheet.setEnabled(True)
 
     @QtCore.Slot()
@@ -246,8 +247,8 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def on_acquireThread_finished(self):
         self.startButton.setEnabled(True)
 
-    def setData(self, data):
-        self.analyzerWidget.setData(data)
+    def setData(self, data, redraw=False):
+        self.analyzerWidget.setData(data, redraw)
         self.reloadByteLabels()
 
     def reloadByteLabels(self):
@@ -294,7 +295,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         event.accept()
 
 if __name__ == '__main__':
-    QtGui.QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
     app = QtGui.QApplication(sys.argv)
     mainWindow = MainWindow(app)
     mainWindow.show()

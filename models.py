@@ -44,9 +44,9 @@ class Acquisition:
                                           lambda x: ord(x) & 0x0F)]
             unpacked_data = [[int(i) for i in list(bin(d)[2:].zfill(4))]
                              for d in sep_channel_data]
-            self.data = zip(*unpacked_data)
+            self.data = list(zip(*unpacked_data))
             self.data.reverse()
-        elif isinstance(data, str) or isinstance(data, unicode):
+        elif isinstance(data, str):
             self.load_csv_file(data)
             return
         else:
@@ -73,13 +73,13 @@ class Acquisition:
         return out_string
 
     def load_csv_file(self, fname):
-        with open(fname, 'rb') as f:
+        with open(fname) as f:
             reader = csv.reader(f)
             header = next(reader)
             sample_rate = int(header[0].split('=')[-1])
             data = [[int(d) for d in row] for row in reader
                     if len(row) != 1]
-        self.data = zip(*data)
+        self.data = list(zip(*data))
         self.sample_rate = sample_rate
 
     def __len__(self):

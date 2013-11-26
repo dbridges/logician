@@ -393,6 +393,8 @@ class AnalyzerDialog(QtGui.QDialog, Ui_AnalyzerDialog):
     def __init__(self, parent=None):
         super(AnalyzerDialog, self).__init__(parent)
         self.setupUi(self)
+        self.stackedWidget.setCurrentIndex(
+            self.analyzerTypeComboBox.currentIndex())
 
     @QtCore.Slot()
     def on_analyzerTypeComboBox_currentIndexChanged(self):
