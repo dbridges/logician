@@ -149,7 +149,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                            self.protocolComboBox,
                            'displayModeIndex':
                            self.displayModeComboBox}
-
         # load themes
         self.themeManager = ThemeManager('ui/themes/')
         for name in self.themeManager.theme_names():
@@ -157,7 +156,6 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             action.setCheckable(True)
 
         self.analyzerWidget.setTheme(self.themeManager.theme_named('Dark'))
-        print('hey')
         for action in self.menuTheme.actions():
             if action.text() == 'Dark':
                 action.setChecked(True)
@@ -254,11 +252,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def reloadByteLabels(self):
         data = self.analyzerWidget.data
         analyzer = None
-        if self.protocolComboBox.currentText() == 'USART':
+        if 'USART' in self.protocolComboBox.currentText():
             analyzer = analyzers.USARTAnalyzer(data)
-        elif self.protocolComboBox.currentText() == 'I2C':
+        elif 'I2C' in self.protocolComboBox.currentText():
             analyzer = analyzers.I2CAnalyzer(data)
-        elif self.protocolComboBox.currentText() == 'SPI':
+        elif 'SPI' in self.protocolComboBox.currentText():
             analyzer = analyzers.SPIAnalyzer(data)
         if analyzer is not None:
             self.analyzerWidget.setByteLabels(analyzer.labels(), redraw=True)
