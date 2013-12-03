@@ -127,6 +127,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.app = parent_app
         self.acquireThread = None
+        self.currentAnalyzer = None
         self.setupUi(self)
         for key in AnalyzerCommand.sample_counts:
             self.sampleCountComboBox.addItem(key)
@@ -215,13 +216,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def on_protocolComboBox_activated(self):
-        #self.analyzerWidget.setWaveformLabels(
-            #analyzers.labels(self.protocolComboBox.currentText()))
         if self.protocolComboBox.currentIndex() != 0:
             dialog = ui.widgets.AnalyzerDialog(self)
-            dialog.analyzerTypeComboBox.setCurrentIndex(
+            dialog.protocolComboBox.setCurrentIndex(
                 self.protocolComboBox.currentIndex() - 1)
-            dialog.exec_()
+            if dialog.exec_() == 1:
+                self.currentAnalyzer = self.setAnalyzerFromDialog(dialog)
+                self.protocolComboBox.setCurrentIndex(
+                    dialog.protocolComboBox.currentIndex() + 1)
             self.reloadByteLabels()
 
     @QtCore.Slot()
@@ -249,17 +251,20 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.analyzerWidget.setData(data, redraw)
         self.reloadByteLabels()
 
-    def reloadByteLabels(self):
+    def setAnalyzerFromDialog(self, dialog):
         data = self.analyzerWidget.data
-        analyzer = None
-        if 'USART' in self.protocolComboBox.currentText():
+        if 'USART' in dialog.protocolComboBox.currentText():
             analyzer = analyzers.USARTAnalyzer(data)
-        elif 'I2C' in self.protocolComboBox.currentText():
+        elif 'I2C' in dialog.protocolComboBox.currentText():
             analyzer = analyzers.I2CAnalyzer(data)
-        elif 'SPI' in self.protocolComboBox.currentText():
+        elif 'SPI' in dialog.protocolComboBox.currentText():
             analyzer = analyzers.SPIAnalyzer(data)
-        if analyzer is not None:
-            self.analyzerWidget.setByteLabels(analyzer.labels(), redraw=True)
+        return analyzer
+
+    def reloadByteLabels(self):
+        if self.currentAnalyzer is not None:
+            self.analyzerWidget.setByteLabels(self.currentAnalyzer.labels(),
+                                              redraw=True)
 
     def loadSettings(self):
         try:

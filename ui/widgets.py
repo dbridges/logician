@@ -394,9 +394,9 @@ class AnalyzerDialog(QtGui.QDialog, Ui_AnalyzerDialog):
         super(AnalyzerDialog, self).__init__(parent)
         self.setupUi(self)
         self.stackedWidget.setCurrentIndex(
-            self.analyzerTypeComboBox.currentIndex())
+            self.protocolComboBox.currentIndex())
 
     @QtCore.Slot()
-    def on_analyzerTypeComboBox_currentIndexChanged(self):
+    def on_protocolComboBox_currentIndexChanged(self):
         self.stackedWidget.setCurrentIndex(
-            self.analyzerTypeComboBox.currentIndex())
+            self.protocolComboBox.currentIndex())

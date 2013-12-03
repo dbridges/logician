@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/AnalyzerDialog.ui'
 #
-# Created: Mon Dec  2 13:23:53 2013
+# Created: Tue Dec  3 11:00:56 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,17 +22,17 @@ class Ui_AnalyzerDialog(object):
         self.analyzerTypeLabel = QtGui.QLabel(AnalyzerDialog)
         self.analyzerTypeLabel.setObjectName("analyzerTypeLabel")
         self.formLayout_2.setWidget(0, QtGui.QFormLayout.LabelRole, self.analyzerTypeLabel)
-        self.analyzerTypeComboBox = QtGui.QComboBox(AnalyzerDialog)
+        self.protocolComboBox = QtGui.QComboBox(AnalyzerDialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.analyzerTypeComboBox.sizePolicy().hasHeightForWidth())
-        self.analyzerTypeComboBox.setSizePolicy(sizePolicy)
-        self.analyzerTypeComboBox.setObjectName("analyzerTypeComboBox")
-        self.analyzerTypeComboBox.addItem("")
-        self.analyzerTypeComboBox.addItem("")
-        self.analyzerTypeComboBox.addItem("")
-        self.formLayout_2.setWidget(0, QtGui.QFormLayout.FieldRole, self.analyzerTypeComboBox)
+        sizePolicy.setHeightForWidth(self.protocolComboBox.sizePolicy().hasHeightForWidth())
+        self.protocolComboBox.setSizePolicy(sizePolicy)
+        self.protocolComboBox.setObjectName("protocolComboBox")
+        self.protocolComboBox.addItem("")
+        self.protocolComboBox.addItem("")
+        self.protocolComboBox.addItem("")
+        self.formLayout_2.setWidget(0, QtGui.QFormLayout.FieldRole, self.protocolComboBox)
         self.verticalLayout_2.addLayout(self.formLayout_2)
         self.line = QtGui.QFrame(AnalyzerDialog)
         self.line.setFrameShape(QtGui.QFrame.HLine)
@@ -114,9 +114,9 @@ class Ui_AnalyzerDialog(object):
     def retranslateUi(self, AnalyzerDialog):
         AnalyzerDialog.setWindowTitle(QtGui.QApplication.translate("AnalyzerDialog", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
         self.analyzerTypeLabel.setText(QtGui.QApplication.translate("AnalyzerDialog", "Analyzer Type", None, QtGui.QApplication.UnicodeUTF8))
-        self.analyzerTypeComboBox.setItemText(0, QtGui.QApplication.translate("AnalyzerDialog", "I2C", None, QtGui.QApplication.UnicodeUTF8))
-        self.analyzerTypeComboBox.setItemText(1, QtGui.QApplication.translate("AnalyzerDialog", "SPI", None, QtGui.QApplication.UnicodeUTF8))
-        self.analyzerTypeComboBox.setItemText(2, QtGui.QApplication.translate("AnalyzerDialog", "USART", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(0, QtGui.QApplication.translate("AnalyzerDialog", "I2C", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(1, QtGui.QApplication.translate("AnalyzerDialog", "SPI", None, QtGui.QApplication.UnicodeUTF8))
+        self.protocolComboBox.setItemText(2, QtGui.QApplication.translate("AnalyzerDialog", "USART", None, QtGui.QApplication.UnicodeUTF8))
         self.baudLabel.setText(QtGui.QApplication.translate("AnalyzerDialog", "Baud", None, QtGui.QApplication.UnicodeUTF8))
         self.baudComboBox.setItemText(0, QtGui.QApplication.translate("AnalyzerDialog", "300", None, QtGui.QApplication.UnicodeUTF8))
         self.baudComboBox.setItemText(1, QtGui.QApplication.translate("AnalyzerDialog", "1200", None, QtGui.QApplication.UnicodeUTF8))
