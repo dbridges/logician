@@ -190,9 +190,9 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             return
         try:
             data = Acquisition(filename)
-        except:
+        except Exception as e:
             msg = QtGui.QMessageBox()
-            msg.setText('Error loading file.')
+            msg.setText('Error loading file.\n\n%s' % e)
             msg.exec_()
 
             return
